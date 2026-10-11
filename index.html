@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Run Log</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#C53A3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Run Log">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#F6F4F4; --surface:#FFFFFF; --ink:#16130F; --ink2:#4E4A47; --muted:#857F7B; --line:#E7E2E0; --grid:#EEEAE8;
+  --red:#C53A3A; --red-deep:#8E0E16; --red-soft:#FBE3E3; --good:#1E8A4A; --warn:#B26A00;
+  --hero:#C53A3A;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#100E0E; --surface:#1B1818; --ink:#F4F1F0; --ink2:#C2BCB9; --muted:#8F8885; --line:#2D2828; --grid:#262121;
+    --red:#EE6262; --red-soft:#3A1616; --good:#43C37A; --warn:#E6A23C; --hero:#A82E31}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px}
+.tab{display:none;animation:fade .25s ease}
+.tab.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- WEEK: red hero with ring ---------- */
+.hero{background:var(--hero);
+  color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 64px;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;height:44px}
+.brand{font-weight:800;font-size:17px;letter-spacing:-.2px}
+.brand span{font-weight:500;opacity:.85;margin-left:8px;font-size:14px}
+.iconbtn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14)}
+.iconbtn svg{width:21px;height:21px;stroke:#fff}
+.chip{display:inline-flex;gap:8px;align-items:center;margin-top:6px;background:rgba(0,0,0,.2);border-radius:20px;padding:5px 6px 5px 12px;font-size:12.5px}
+.chip button{background:#fff;color:var(--hero);font-weight:700;border-radius:14px;padding:3px 10px;font-size:12px}
+.ringwrap{position:relative;width:230px;height:230px;margin:14px auto 6px}
+.ringwrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ringwrap circle{fill:none;stroke-width:16;stroke-linecap:round}
+.ring-track{stroke:rgba(255,255,255,.18)}
+.ring-fill{stroke:#fff;transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.ring-over{stroke:#FFD2D2}
+.ringtext{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringtext .n{font-size:60px;font-weight:800;letter-spacing:-2.5px;line-height:1}
+.ringtext .of{font-size:15px;opacity:.85;font-weight:600;margin-top:4px}
+.herosub{text-align:center;font-size:15px;opacity:.95;max-width:300px;margin:4px auto 0}
+.herosub b{font-weight:800}
+
+/* weekday strip floats over the hero edge */
+.days{display:flex;gap:8px;margin:-40px 0 0;position:relative;z-index:2}
+.day{flex:1;background:var(--surface);border-radius:18px;padding:10px 0 9px;text-align:center;box-shadow:0 8px 24px rgba(60,10,10,.12)}
+.day .l{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.6px}
+.day .v{font-size:16px;font-weight:800;margin-top:3px;height:24px;display:flex;align-items:center;justify-content:center}
+.day .tick{width:22px;height:22px;border-radius:50%;border:2px dashed var(--line)}
+.day.done{color:var(--red);box-shadow:inset 0 -4px 0 var(--red),0 8px 24px rgba(60,10,10,.12)}
+.day.today{outline:2.5px solid var(--red);outline-offset:2px}
+.day.future .tick{border-style:solid;border-color:var(--grid)}
+
+/* stat row: no boxes, dividers */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 8px}
+.stat{background:var(--surface);border-radius:18px;padding:16px 10px 14px;text-align:center}
+.stat .k{font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.stat .n{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-top:4px}
+.stat .n small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0;margin-left:2px}
+.stat .p{font-size:12.5px;font-weight:600;margin-top:3px}
+.ahead{color:var(--good)} .behind{color:var(--warn)} .meh{color:var(--muted)}
+
+.insight{margin:20px 0 0;padding:14px 16px;border-radius:16px;background:var(--red-soft);display:flex;gap:12px;align-items:flex-start}
+.insight svg{flex:none;width:22px;height:22px;stroke:var(--red);margin-top:1px}
+.insight p{margin:0;font-size:14.5px;color:var(--ink)}
+
+/* ---------- shared section headings ---------- */
+.pagehead{padding:calc(18px + env(safe-area-inset-top)) 0 6px;display:flex;justify-content:space-between;align-items:flex-end}
+.pagehead h1{margin:0;font-size:32px;letter-spacing:-1px}
+.pagehead .s{color:var(--muted);font-size:14px;font-weight:500}
+h2{font-size:13px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:28px 0 12px;display:flex;justify-content:space-between;align-items:baseline}
+h2 span{text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;color:var(--ink2)}
+
+/* pace tracks */
+.track{margin-bottom:18px}
+.track .top{display:flex;justify-content:space-between;align-items:baseline}
+.track .t{font-weight:700;font-size:15px}
+.track .n{font-weight:800;font-size:22px;letter-spacing:-.6px}
+.track .n small{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:0}
+.rail{height:12px;border-radius:8px;background:var(--grid);position:relative;margin:8px 0 6px}
+.rail i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:var(--red)}
+.rail b{position:absolute;top:-4px;width:3px;height:20px;border-radius:2px;background:var(--ink)}
+.track .p{font-size:13px;font-weight:600}
+
+/* charts */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-size:11px;fill:var(--muted)}
+.chart text.halo{paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12.5px;padding:7px 10px;border-radius:9px;
+  white-space:nowrap;transform:translate(-50%,-100%);opacity:0;transition:opacity .12s;z-index:3}
+.tip b{display:block;font-size:14px}
+
+/* ---------- RECORDS ---------- */
+.bests{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.best{border-radius:18px;padding:14px 14px 12px;background:var(--surface);position:relative;overflow:hidden}
+.best.hl{background:var(--hero);color:#fff;grid-column:span 2;padding:18px}
+.best .n{font-size:26px;font-weight:800;letter-spacing:-.8px;line-height:1.1}
+.best.hl .n{font-size:40px;letter-spacing:-1.5px}
+.best .l{font-size:12.5px;color:var(--muted);margin-top:3px}
+.best.hl .l{color:rgba(255,255,255,.85);font-size:13.5px}
+.wk{margin-top:18px}
+.wkhead{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 6px;border-bottom:2px solid var(--ink)}
+.wkhead .t{font-weight:800;font-size:14px}
+.wkhead .s{font-size:13px;font-weight:700}
+.wkhead .s.hit{color:var(--red)}
+.run{display:flex;align-items:center;justify-content:space-between;padding:10px 2px;border-bottom:1px solid var(--line)}
+.run .d{color:var(--ink2);font-size:14.5px}
+.run .k{font-weight:700;font-variant-numeric:tabular-nums}
+.run .x{color:var(--muted);font-size:20px;padding:0 2px 0 14px;line-height:1}
+.more{display:block;width:100%;margin:16px 0 8px;padding:12px;border-radius:14px;background:var(--surface);font-weight:700}
+
+/* ---------- tab bar + add button ---------- */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 76px 1fr 1fr;align-items:center;height:64px}
+.tb{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--muted)}
+.tb svg{width:24px;height:24px;stroke:currentColor}
+.tb.on{color:var(--red)}
+.add{width:62px;height:62px;border-radius:50%;background:var(--hero);color:#fff;margin:-30px auto 0;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(197,58,58,.35),0 0 0 5px var(--bg)}
+.add svg{width:28px;height:28px;stroke:#fff}
+.add:active{transform:scale(.95)}
+
+/* sheets */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));
+  transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:21;max-width:520px;margin:0 auto}
+.sheet::before{content:'';display:block;width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+body.open .scrim{opacity:1;pointer-events:auto}
+.sheet.show{transform:none}
+.sheet h3{margin:0 0 16px;font-size:22px;letter-spacing:-.4px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.field input{width:100%;font-family:inherit;font-weight:600;font-size:18px;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink)}
+.field input:focus{outline:none;border-color:var(--red)}
+.bigkm input{font-size:40px;font-weight:800;text-align:center;letter-spacing:-1px;padding:16px}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.hint{font-size:13px;color:var(--muted);margin:-4px 0 14px}
+.primary{width:100%;background:var(--red);color:#fff;font-weight:800;font-size:16px;padding:15px;border-radius:16px}
+.secondary{width:100%;background:var(--bg);font-weight:700;padding:13px;border-radius:14px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- WEEK -->
+<section class="tab on" id="t-week">
+  <div class="hero">
+    <div class="wrap">
+      <div class="topbar"><div class="brand">Run Log<span id="todayLbl"></span></div>
+        <button class="iconbtn" id="openSettings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
+      <div id="sampleChip" class="chip" hidden>Sample data <button id="clearSample">Clear</button></div>
+      <div class="ringwrap">
+        <svg viewBox="0 0 230 230"><circle class="ring-track" cx="115" cy="115" r="96"/><circle class="ring-fill" id="ring" cx="115" cy="115" r="96"/></svg>
+        <div class="ringtext"><div class="n" id="wkKm">0</div><div class="of" id="wkOf"></div></div>
+      </div>
+      <p class="herosub" id="wkSub"></p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="days" id="wkDays"></div>
+    <div class="stats">
+      <div class="stat"><div class="k">Streak</div><div class="n" id="stStreak"></div><div class="p meh" id="stStreakP"></div></div>
+      <div class="stat"><div class="k" id="stMoL">Month</div><div class="n" id="stMo"></div><div class="p" id="stMoP"></div></div>
+    </div>
+    <div class="insight" id="insight"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><p id="insightTxt"></p></div>
+  </div>
+</section>
+
+<!-- PROGRESS -->
+<section class="tab" id="t-progress"><div class="wrap">
+  <div class="pagehead"><h1>Progress</h1><span class="s" id="progSub"></span></div>
+  <h2>Goals</h2>
+  <div class="track" id="trWeek"></div>
+  <div class="track" id="trMonth"></div>
+  <div class="track" id="trYear"></div>
+  <h2>Weekly km <span>last 12 weeks</span></h2>
+  <div class="chart" id="weeklyChart"></div>
+  <h2>Average run <span id="avgNote"></span></h2>
+  <div class="chart" id="avgChart"></div>
+</div></section>
+
+<!-- RECORDS -->
+<section class="tab" id="t-records"><div class="wrap">
+  <div class="pagehead"><h1>Records</h1><span class="s" id="recSub"></span></div>
+  <h2>Personal bests</h2>
+  <div class="bests" id="bests"></div>
+  <h2>History</h2>
+  <div id="history"></div>
+  <button class="more" id="showMore" hidden>Show earlier weeks</button>
+</div></section>
+
+<nav class="tabbar"><div class="in">
+  <button class="tb on" data-tab="week"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Week</button>
+  <button class="tb" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress</button>
+  <button class="add" id="openAdd" aria-label="Add a run"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="tb" data-tab="records"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Records</button>
+  <button class="tb" id="openSync"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>Health</button>
+</div></nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="addSheet" role="dialog" aria-label="Add a run">
+  <h3>Add a run</h3>
+  <div class="field bigkm"><input id="inKm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.0" aria-label="Distance in km"></div>
+  <div class="field"><label for="inDate">Date</label><input id="inDate" type="date"></div>
+  <button class="primary" id="saveRun">Save run</button>
+</div>
+<div class="sheet" id="setSheet" role="dialog" aria-label="Settings">
+  <h3>Goals</h3>
+  <div class="row">
+    <div class="field"><label for="inWeek">Weekly (km)</label><input id="inWeek" type="number" inputmode="decimal" min="0"></div>
+    <div class="field"><label for="inYear">Yearly (km)</label><input id="inYear" type="number" inputmode="decimal" min="0"></div>
+  </div>
+  <p class="hint">Monthly target is your yearly target spread evenly across the year.</p>
+  <button class="primary" id="saveSet">Save goals</button>
+  <button class="secondary" id="exportBtn">Export backup</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='runlog.v2',DAY=86400000;
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+/* ---------- dates (local time, Monday-start weeks) ---------- */
+function pad(n){return n<10?'0'+n:''+n}
+function key(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parse(k){var p=k.split('-');return new Date(+p[0],p[1]-1,+p[2])}
+function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x}
+function monday(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());return addDays(x,-((x.getDay()+6)%7))}
+function isWeekday(d){var w=d.getDay();return w>0&&w<6}
+function short(d){return d.getDate()+' '+MON[d.getMonth()]}
+function fmt(n,dp){dp=dp==null?1:dp;return (Math.round(n*Math.pow(10,dp))/Math.pow(10,dp)).toFixed(dp)}
+function $(id){return document.getElementById(id)}
+
+/* ---------- state ---------- */
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.runs)return s}catch(e){}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var S=load();
+if(!S){S={weekly:35,yearly:1800,runs:sample(),sample:true};save()}
+/* Preview only: ?today=2026-10-07 shows the app as it looked on that day. Nothing is saved in this mode. */
+var PREVIEW=(location.search.match(/today=(\d{4}-\d{2}-\d{2})/)||[])[1];
+if(PREVIEW){S=JSON.parse(JSON.stringify(S));S.runs=S.runs.filter(function(r){return r.date<=PREVIEW});save=function(){}}
+
+/* Believable sample: weekday runs slowly getting longer, the odd missed day, rare weekend long run */
+function sample(){
+  var seed=11;function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
+  var out=[],today=new Date(),start=addDays(today,-120);
+  for(var d=new Date(start),i=0;d<today;d=addDays(d,1),i++){
+    if(isWeekday(d)){if(rnd()<0.86)out.push({date:key(d),km:+(5.2+i*0.018+rnd()*2.4).toFixed(2),src:'sample'})}
+    else if(rnd()<0.12)out.push({date:key(d),km:+(9+rnd()*4).toFixed(2),src:'sample'});
+  }
+  return out;
+}
+
+function kmByDay(){var m={};S.runs.forEach(function(r){m[r.date]=(m[r.date]||0)+r.km});return m}
+function sumRange(m,from,to){var t=0;for(var d=new Date(from);d<=to;d=addDays(d,1))t+=m[key(d)]||0;return t}
+function todayD(){if(PREVIEW)return parse(PREVIEW);var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
+
+/* All the numbers every tab needs, worked out once */
+function compute(){
+  var m=kmByDay(),today=todayD(),tk=key(today),mon=monday(today),C={m:m,today:today,mon:mon};
+  C.wk=sumRange(m,mon,addDays(mon,6));
+  C.left=0;for(var i=0;i<5;i++){var dd=addDays(mon,i);if(dd>today||(key(dd)===tk&&!m[tk]))C.left++}
+  var st=0,d=new Date(today);if(!m[tk])d=addDays(d,-1);
+  while(true){if(!isWeekday(d)){d=addDays(d,-1);continue}if(!m[key(d)])break;st++;d=addDays(d,-1)}
+  C.streak=st;C.bestStreak=bestStreak(m);
+  var yrDays=(new Date(today.getFullYear()+1,0,1)-new Date(today.getFullYear(),0,1))/DAY;
+  var dim=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  C.mo={km:sumRange(m,new Date(today.getFullYear(),today.getMonth(),1),today),target:S.yearly*dim/yrDays,frac:today.getDate()/dim,label:MON[today.getMonth()]};
+  /* Year pace counts from your first run if you started this year, so starting mid-year isn't "behind" */
+  var y0=new Date(today.getFullYear(),0,1),firstK=S.runs.map(function(r){return r.date}).sort()[0];
+  var ys=firstK&&parse(firstK)>y0?parse(firstK):y0,span=(new Date(today.getFullYear()+1,0,1)-ys)/DAY,gone=Math.round((today-ys)/DAY)+1;
+  C.yr={km:sumRange(m,y0,today),target:S.yearly*span/yrDays,frac:gone/span,label:''+today.getFullYear(),since:ys>y0?ys:null};
+  C.yr.proj=C.yr.km/gone*span;
+  C.wkFrac=Math.min(1,(5-C.left)/5);
+  return C;
+}
+function pace(o){return o.km-o.target*o.frac}
+
+function bestStreak(m){
+  var ks=Object.keys(m).sort();if(!ks.length)return 0;var best=0,cur=0,end=todayD();
+  for(var d=parse(ks[0]);d<=end;d=addDays(d,1)){if(!isWeekday(d))continue;
+    if(m[key(d)]){cur++;if(cur>best)best=cur}else if(key(d)!==key(end))cur=0}
+  return best;
+}
+
+/* ---------- WEEK tab ---------- */
+function renderWeek(C){
+  var m=C.m,tk=key(C.today);
+  $('todayLbl').textContent=WD[C.today.getDay()]+' '+short(C.today);
+  $('sampleChip').hidden=!S.sample;
+  var circ=2*Math.PI*96,f=Math.min(1,C.wk/S.weekly),ring=$('ring');
+  ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){ring.style.strokeDashoffset=circ*(1-f)})});
+  $('wkKm').textContent=fmt(C.wk);
+  $('wkOf').textContent='of '+S.weekly+' km this week';
+  var togo=Math.max(0,S.weekly-C.wk),sub;
+  if(togo<=0)sub='<b>Target smashed.</b> Everything from here is a bonus.';
+  else if(C.left===0)sub='<b>'+fmt(togo)+' km</b> short. A weekend run would close it.';
+  else sub='<b>'+fmt(togo)+' km</b> to go &middot; '+C.left+' weekday'+(C.left>1?'s':'')+' left &middot; <b>'+fmt(togo/C.left)+' km</b> a run';
+  $('wkSub').innerHTML=sub;
+  var h='';['M','T','W','T','F'].forEach(function(l,i){
+    var dd=addDays(C.mon,i),k=key(dd),c='day';
+    if(m[k])c+=' done';else if(dd>C.today)c+=' future';
+    if(k===tk)c+=' today';
+    h+='<div class="'+c+'"><div class="l">'+l+'</div><div class="v">'+(m[k]?fmt(m[k]):'<span class="tick"></span>')+'</div></div>';
+  });
+  $('wkDays').innerHTML=h;
+  $('stStreak').innerHTML=C.streak+'<small>days</small>';
+  $('stStreakP').textContent=C.streak>=C.bestStreak&&C.streak>0?'Best ever':'Best '+C.bestStreak;
+  var moRuns=S.runs.filter(function(r){return r.date.slice(0,7)===tk.slice(0,7)}).length;
+  $('stMoL').textContent=C.mo.label;$('stMo').innerHTML=fmt(C.mo.km,0)+'<small>km</small>';
+  $('stMoP').className='p meh';$('stMoP').textContent=moRuns+' run'+(moRuns===1?'':'s');
+  $('insightTxt').innerHTML=insight(C);
+}
+
+/* One plain-English observation, the thing Apple Fitness won't tell you */
+/* First two weeks vs last two, so one odd week doesn't swing it. Used by the insight and the chart note. */
+function avgChange(pts){if(pts.length<4)return null;var n=pts.length,e=(pts[0].v+pts[1].v)/2,l=(pts[n-1].v+pts[n-2].v)/2;return Math.round((l-e)/e*100)}
+function insight(C){
+  var pts=weekAvgs(C.mon).filter(function(p){return p}),ch=avgChange(pts);
+  if(ch!=null&&Math.abs(ch)>=5){var n=pts.length;
+    return 'Your average run is <b>'+Math.abs(ch)+'% '+(ch>0?'longer':'shorter')+'</b> than 12 weeks ago ('+fmt((pts[0].v+pts[1].v)/2)+' km to '+fmt((pts[n-1].v+pts[n-2].v)/2)+' km).'}
+  var d=pace(C.yr);
+  return 'At this rate you’ll finish the year on <b>'+Math.round(C.yr.proj)+' km</b>.';
+}
+
+/* ---------- PROGRESS tab ---------- */
+function renderProgress(C){
+  $('progSub').textContent=short(C.today);
+  track('trWeek','This week',{km:C.wk,target:S.weekly,frac:C.wkFrac},'');
+  track('trMonth',MON[C.today.getMonth()],C.mo,'');
+  track('trYear',C.yr.label,C.yr,C.yr.since?'Counted from your first run on '+short(C.yr.since)+'. On track for '+Math.round(C.yr.proj)+' km.':'On track for '+Math.round(C.yr.proj)+' km.');
+  weeklyChart(C);avgChart(C);
+}
+function track(id,label,o,note){
+  var d=pace(o);
+  $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">'+fmt(o.km,0)+' <small>/ '+Math.round(o.target)+' km</small></span></div>'+
+    '<div class="rail"><i style="width:'+Math.min(100,o.km/o.target*100)+'%"></i><b style="left:calc('+Math.min(100,o.frac*100)+'% - 1.5px)"></b></div>'+
+    '<div class="p '+(d>=0?'ahead':'behind')+'">'+(d>=0?'▲ ':'▼ ')+fmt(Math.abs(d))+' km '+(d>=0?'ahead of':'behind')+' pace'+(note?'<span class="meh" style="font-weight:500"> &middot; '+note+'</span>':'')+'</div>';
+}
+
+function weeks(mon,n){var a=[];for(var i=n-1;i>=0;i--)a.push(addDays(mon,-7*i));return a}
+function weekAvgs(mon){
+  return weeks(mon,12).map(function(w){var s=key(w),e=key(addDays(w,6)),rs=S.runs.filter(function(r){return r.date>=s&&r.date<=e});
+    return rs.length?{v:rs.reduce(function(a,r){return a+r.km},0)/rs.length,n:rs.length,w:w}:null});
+}
+
+function weeklyChart(C){
+  var ws=weeks(C.mon,12),vals=ws.map(function(w){return sumRange(C.m,w,addDays(w,6))});
+  var W=340,H=180,L=26,B=22,T=12,max=Math.max(S.weekly*1.2,Math.max.apply(null,vals)*1.08);
+  var bw=(W-L)/12,y=function(v){return T+(H-T-B)*(1-v/max)};
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Weekly kilometres for the last 12 weeks">';
+  var stepV=max>60?20:10;
+  for(var v=0;v<=max;v+=stepV)s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--grid)"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+v+'</text>';
+  vals.forEach(function(v,i){
+    var x=L+i*bw+bw*0.16,w=bw*0.68,yy=y(v),h=Math.max(0,H-B-yy),cur=i===11,r=Math.min(4,w/2,h);
+    if(h>0)s+='<path d="M'+x+','+(H-B)+'V'+(yy+r)+'q0,-'+r+' '+r+',-'+r+'H'+(x+w-r)+'q'+r+',0 '+r+','+r+'V'+(H-B)+'Z" fill="var(--red)" opacity="'+(cur?0.45:(v>=S.weekly?1:0.78))+'"/>';
+    s+='<rect class="hit" data-i="'+i+'" x="'+(L+i*bw)+'" y="'+T+'" width="'+bw+'" height="'+(H-T-B)+'" fill="transparent"/>';
+    if(i%3===2||cur)s+='<text x="'+(L+i*bw+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+(cur?'Now':short(ws[i]))+'</text>';
+  });
+  s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(S.weekly)+'" y2="'+y(S.weekly)+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 4"/>';
+  s+='<text class="halo" x="'+(L+4)+'" y="'+(y(S.weekly)-6)+'" style="fill:var(--ink);font-weight:700">Target '+S.weekly+'</text></svg><div class="tip"></div>';
+  var el=$('weeklyChart');el.innerHTML=s;
+  hover(el,function(i){return {x:L+i*bw+bw/2,y:y(vals[i]),html:'<b>'+fmt(vals[i])+' km</b>Week of '+short(ws[i])+(i===11?' (so far)':vals[i]>=S.weekly?', target hit':'')}},W);
+}
+
+function avgChart(C){
+  var ws=weeks(C.mon,12),a=weekAvgs(C.mon),pts=[];a.forEach(function(p,i){if(p){p.i=i;pts.push(p)}});
+  var el=$('avgChart');
+  if(pts.length<2){el.innerHTML='<p class="meh">Needs a couple of weeks of runs.</p>';$('avgNote').textContent='';return}
+  var W=340,H=160,L=26,B=22,T=24,vs=pts.map(function(p){return p.v});
+  var lo=Math.floor(Math.min.apply(null,vs)-0.5),hi=Math.ceil(Math.max.apply(null,vs)+0.5),step=(W-L-10)/11;
+  var x=function(i){return L+5+i*step},y=function(v){return T+(H-T-B)*(1-(v-lo)/(hi-lo))};
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Average run distance per week">';
+  [lo,(lo+hi)/2,hi].forEach(function(v){s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--grid)"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmt(v,v%1?1:0)+'</text>'});
+  var line=pts.map(function(p,k){return (k?'L':'M')+x(p.i)+','+y(p.v)}).join('');
+  s+='<path d="'+line+'L'+x(pts[pts.length-1].i)+','+(H-B)+'L'+x(pts[0].i)+','+(H-B)+'Z" fill="var(--red)" opacity=".08"/>';
+  s+='<path d="'+line+'" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  s+='<line class="xh" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink2)" stroke-width="1" opacity="0"/>';
+  pts.forEach(function(p,k){var last=k===pts.length-1;s+='<circle cx="'+x(p.i)+'" cy="'+y(p.v)+'" r="'+(last?5:3.5)+'" fill="var(--red)" stroke="var(--bg)" stroke-width="2"/>'});
+  var lp=pts[pts.length-1];
+  s+='<text class="halo" x="'+(x(lp.i)+4)+'" y="'+(y(lp.v)-12)+'" text-anchor="end" style="fill:var(--ink);font-weight:700;font-size:12px">'+fmt(lp.v)+' km</text>';
+  ws.forEach(function(w,i){if(i%3===2||i===11)s+='<text x="'+x(i)+'" y="'+(H-6)+'" text-anchor="middle">'+(i===11?'Now':short(w))+'</text>';
+    s+='<rect class="hit" data-i="'+i+'" x="'+(x(i)-step/2)+'" y="'+T+'" width="'+step+'" height="'+(H-T-B)+'" fill="transparent"/>'});
+  s+='</svg><div class="tip"></div>';el.innerHTML=s;
+  var ch=avgChange(pts);$('avgNote').textContent=ch==null?'':(ch>=0?'up ':'down ')+Math.abs(ch)+'% in 12 weeks';
+  hover(el,function(i){var p=a[i];if(!p)return null;var xh=el.querySelector('.xh');xh.setAttribute('x1',x(i));xh.setAttribute('x2',x(i));
+    return {x:x(i),y:y(p.v),html:'<b>'+fmt(p.v)+' km avg</b>'+p.n+' run'+(p.n>1?'s':'')+', week of '+short(p.w),xh:xh}},W);
+}
+
+function hover(el,get,W){
+  var tip=el.querySelector('.tip'),svg=el.querySelector('svg'),xh=null;
+  function show(e){var t=e.target.closest('.hit');if(!t)return hide();var r=get(+t.dataset.i);if(!r)return hide();
+    var bw=svg.getBoundingClientRect().width,sc=bw/W;tip.innerHTML=r.html;
+    tip.style.left=Math.max(75,Math.min(bw-75,r.x*sc))+'px';tip.style.top=(r.y*sc-10)+'px';tip.style.opacity=1;
+    if(r.xh){xh=r.xh;xh.setAttribute('opacity','.35')}}
+  function hide(){tip.style.opacity=0;if(xh)xh.setAttribute('opacity','0')}
+  svg.addEventListener('pointermove',show);svg.addEventListener('pointerdown',show);svg.addEventListener('pointerleave',hide);
+}
+
+/* ---------- RECORDS tab ---------- */
+var weeksShown=2;
+function renderRecords(C){
+  var m=C.m,longest=S.runs.reduce(function(a,r){return r.km>a.km?r:a},{km:0}),wk={},mo={};
+  Object.keys(m).forEach(function(k){var w=key(monday(parse(k)));wk[w]=(wk[w]||0)+m[k];mo[k.slice(0,7)]=(mo[k.slice(0,7)]||0)+m[k]});
+  function top(o){var b=null;Object.keys(o).forEach(function(k){if(!b||o[k]>o[b])b=k});return b}
+  var bw=top(wk),bm=top(mo),total=S.runs.reduce(function(a,r){return a+r.km},0);
+  $('recSub').textContent=S.runs.length+' runs';
+  var h='<div class="best hl"><div class="n">'+fmt(total,0)+' km</div><div class="l">All-time total across '+S.runs.length+' runs</div></div>';
+  if(longest.km)h+='<div class="best"><div class="n">'+fmt(longest.km,2)+'</div><div class="l">Longest run (km), '+short(parse(longest.date))+'</div></div>';
+  if(bw)h+='<div class="best"><div class="n">'+fmt(wk[bw])+'</div><div class="l">Best week (km), '+short(parse(bw))+'</div></div>';
+  if(bm)h+='<div class="best"><div class="n">'+fmt(mo[bm],0)+'</div><div class="l">Best month (km), '+MON[+bm.slice(5)-1]+'</div></div>';
+  h+='<div class="best"><div class="n">'+C.bestStreak+'</div><div class="l">Longest weekday streak</div></div>';
+  $('bests').innerHTML=h;
+
+  /* history grouped by week, newest first */
+  var groups={};S.runs.forEach(function(r){var w=key(monday(parse(r.date)));(groups[w]=groups[w]||[]).push(r)});
+  var ks=Object.keys(groups).sort().reverse(),out='';
+  ks.slice(0,weeksShown).forEach(function(w){
+    var rs=groups[w].sort(function(a,b){return a.date<b.date?1:-1}),t=rs.reduce(function(a,r){return a+r.km},0),cur=w===key(C.mon);
+    out+='<div class="wk"><div class="wkhead"><span class="t">'+(cur?'This week':'Week of '+short(parse(w)))+'</span><span class="s'+(t>=S.weekly?' hit':'')+'">'+fmt(t)+' / '+S.weekly+' km</span></div>';
+    rs.forEach(function(r){var d=parse(r.date);out+='<div class="run"><span class="d">'+WD[d.getDay()]+' '+short(d)+'</span><span><span class="k">'+fmt(r.km,2)+' km</span><button class="x" data-date="'+r.date+'" data-km="'+r.km+'" aria-label="Delete run">&times;</button></span></div>'});
+    out+='</div>';
+  });
+  $('history').innerHTML=out||'<p class="meh">No runs yet. Tap + to add one.</p>';
+  $('showMore').hidden=ks.length<=weeksShown;
+}
+
+/* ---------- wiring ---------- */
+function render(){var C=compute();renderWeek(C);renderProgress(C);renderRecords(C)}
+function setTab(t){
+  document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('on',s.id==='t-'+t)});
+  document.querySelectorAll('.tb[data-tab]').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t)});
+  window.scrollTo(0,0);if(t==='week')renderWeek(compute());
+}
+document.querySelectorAll('.tb[data-tab]').forEach(function(b){b.onclick=function(){setTab(b.dataset.tab)}});
+
+$('history').addEventListener('click',function(e){var b=e.target.closest('.x');if(!b||!confirm('Delete this run?'))return;
+  var i=S.runs.findIndex(function(r){return r.date===b.dataset.date&&r.km===+b.dataset.km});if(i>-1){S.runs.splice(i,1);save();render()}});
+$('showMore').onclick=function(){weeksShown+=8;renderRecords(compute())};
+
+function open(id){document.body.classList.add('open');$(id).classList.add('show')}
+function close(){document.body.classList.remove('open');document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('show')})}
+$('scrim').onclick=close;
+$('openAdd').onclick=function(){$('inDate').value=key(new Date());$('inKm').value='';open('addSheet');setTimeout(function(){$('inKm').focus()},280)};
+$('saveRun').onclick=function(){var km=parseFloat($('inKm').value),dt=$('inDate').value;if(!(km>0)||!dt)return;
+  S.runs.push({date:dt,km:+km.toFixed(2),src:'manual'});save();close();setTab('week');render()};
+$('openSettings').onclick=function(){$('inWeek').value=S.weekly;$('inYear').value=S.yearly;open('setSheet')};
+$('saveSet').onclick=function(){var w=parseFloat($('inWeek').value),y=parseFloat($('inYear').value);if(w>0)S.weekly=w;if(y>0)S.yearly=y;save();close();render()};
+$('clearSample').onclick=function(){if(!confirm('Remove the sample runs and start fresh?'))return;S.runs=S.runs.filter(function(r){return r.src!=='sample'});S.sample=false;save();render()};
+$('openSync').onclick=function(){alert('Coming next: an iPhone Shortcut copies your runs from Apple Health, and this button pulls them in.')};
+$('exportBtn').onclick=function(){var blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='run-log-backup-'+key(new Date())+'.json';a.click()};
+
+render();
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(function(){});
+})();
+</script>
+</body>
+</html>
