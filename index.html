@@ -206,7 +206,7 @@ body.open .scrim{opacity:1;pointer-events:auto}
   <button class="tb" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress</button>
   <button class="add" id="openAdd" aria-label="Add a run"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="tb" data-tab="records"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Records</button>
-  <button class="tb" id="openSync"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>Health</button>
+  <button class="tb" id="tabSettings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Settings</button>
 </div></nav>
 
 <div class="scrim" id="scrim"></div>
@@ -458,7 +458,7 @@ $('saveRun').onclick=function(){var km=parseFloat($('inKm').value),dt=$('inDate'
   S.runs.push({date:dt,km:+km.toFixed(2),src:'manual'});save();close();setTab('week');render()};
 $('openSettings').onclick=function(){$('inWeek').value=S.weekly;$('inYear').value=S.yearly;open('setSheet')};
 $('saveSet').onclick=function(){var w=parseFloat($('inWeek').value),y=parseFloat($('inYear').value);if(w>0)S.weekly=w;if(y>0)S.yearly=y;save();close();render()};
-$('openSync').onclick=function(){alert('Coming next: an iPhone Shortcut copies your runs from Apple Health, and this button pulls them in.')};
+$('tabSettings').onclick=function(){$('openSettings').click()};
 $('exportBtn').onclick=function(){var blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='run-log-backup-'+key(new Date())+'.json';a.click()};
 
