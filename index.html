@@ -23,6 +23,7 @@
     --red:#EE6262; --red-soft:#3A1616; --good:#43C37A; --warn:#E6A23C; --hero:#A82E31}
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
@@ -40,8 +41,6 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .brand span{display:block;font-weight:500;opacity:.85;font-size:13px;margin-top:1px}
 .iconbtn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14)}
 .iconbtn svg{width:21px;height:21px;stroke:#fff}
-.chip{display:inline-flex;gap:8px;align-items:center;margin-top:6px;background:rgba(0,0,0,.2);border-radius:20px;padding:5px 6px 5px 12px;font-size:12.5px}
-.chip button{background:#fff;color:var(--hero);font-weight:700;border-radius:14px;padding:3px 10px;font-size:12px}
 .ringwrap{position:relative;width:230px;height:230px;margin:14px auto 6px}
 .ringwrap svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ringwrap circle{fill:none;stroke-width:16;stroke-linecap:round}
@@ -162,7 +161,6 @@ body.open .scrim{opacity:1;pointer-events:auto}
     <div class="wrap">
       <div class="topbar"><div class="brand">Adam&rsquo;s Running Tracker<span id="todayLbl"></span></div>
         <button class="iconbtn" id="openSettings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
-      <div id="sampleChip" class="chip" hidden>Sample data <button id="clearSample">Clear</button></div>
       <div class="ringwrap">
         <svg viewBox="0 0 230 230"><circle class="ring-track" cx="115" cy="115" r="96"/><circle class="ring-fill" id="ring" cx="115" cy="115" r="96"/></svg>
         <div class="ringtext"><div class="n" id="wkKm">0</div><div class="of" id="wkOf"></div></div>
@@ -250,21 +248,12 @@ function $(id){return document.getElementById(id)}
 function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.runs)return s}catch(e){}return null}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 var S=load();
-if(!S){S={weekly:35,yearly:1800,runs:sample(),sample:true};save()}
+if(!S){S={weekly:35,yearly:1800,runs:[]};save()}
+if(S.sample!=null||S.runs.some(function(r){return r.src==='sample'})){S.runs=S.runs.filter(function(r){return r.src!=='sample'});delete S.sample;save()}
 /* Preview only: ?today=2026-10-07 shows the app as it looked on that day. Nothing is saved in this mode. */
 var PREVIEW=(location.search.match(/today=(\d{4}-\d{2}-\d{2})/)||[])[1];
 if(PREVIEW){S=JSON.parse(JSON.stringify(S));S.runs=S.runs.filter(function(r){return r.date<=PREVIEW});save=function(){}}
 
-/* Believable sample: weekday runs slowly getting longer, the odd missed day, rare weekend long run */
-function sample(){
-  var seed=11;function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
-  var out=[],today=new Date(),start=addDays(today,-120);
-  for(var d=new Date(start),i=0;d<today;d=addDays(d,1),i++){
-    if(isWeekday(d)){if(rnd()<0.86)out.push({date:key(d),km:+(5.2+i*0.018+rnd()*2.4).toFixed(2),src:'sample'})}
-    else if(rnd()<0.12)out.push({date:key(d),km:+(9+rnd()*4).toFixed(2),src:'sample'});
-  }
-  return out;
-}
 
 function kmByDay(){var m={};S.runs.forEach(function(r){m[r.date]=(m[r.date]||0)+r.km});return m}
 function sumRange(m,from,to){var t=0;for(var d=new Date(from);d<=to;d=addDays(d,1))t+=m[key(d)]||0;return t}
@@ -285,7 +274,7 @@ function compute(){
   var y0=new Date(today.getFullYear(),0,1),firstK=S.runs.map(function(r){return r.date}).sort()[0];
   var ys=firstK&&parse(firstK)>y0?parse(firstK):y0,span=(new Date(today.getFullYear()+1,0,1)-ys)/DAY,gone=Math.round((today-ys)/DAY)+1;
   C.yr={km:sumRange(m,y0,today),target:S.yearly*span/yrDays,frac:gone/span,label:''+today.getFullYear(),since:ys>y0?ys:null};
-  C.yr.proj=C.yr.km/gone*span;
+  C.yr.proj=C.yr.km/gone*span;C.yr.settled=gone>=14;
   C.wkFrac=Math.min(1,(5-C.left)/5);
   return C;
 }
@@ -302,14 +291,14 @@ function bestStreak(m){
 function renderWeek(C){
   var m=C.m,tk=key(C.today);
   $('todayLbl').textContent=WD[C.today.getDay()]+' '+short(C.today);
-  $('sampleChip').hidden=!S.sample;
   var circ=2*Math.PI*96,f=Math.min(1,C.wk/S.weekly),ring=$('ring');
   ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ;
   requestAnimationFrame(function(){requestAnimationFrame(function(){ring.style.strokeDashoffset=circ*(1-f)})});
   $('wkKm').textContent=fmt(C.wk);
   $('wkOf').textContent='of '+S.weekly+' km this week';
   var togo=Math.max(0,S.weekly-C.wk),sub;
-  if(togo<=0)sub='<b>Target smashed.</b> Everything from here is a bonus.';
+  if(!S.runs.length)sub='Your first week starts here. Tap <b>+</b> after a run.';
+  else if(togo<=0)sub='<b>Target smashed.</b> Everything from here is a bonus.';
   else if(C.left===0)sub='<b>'+fmt(togo)+' km</b> short. A weekend run would close it.';
   else sub='<b>'+fmt(togo)+' km</b> to go &middot; '+C.left+' weekday'+(C.left>1?'s':'')+' left &middot; <b>'+fmt(togo/C.left)+' km</b> a run';
   $('wkSub').innerHTML=sub;
@@ -335,8 +324,9 @@ function insight(C){
   var pts=weekAvgs(C.mon).filter(function(p){return p}),ch=avgChange(pts);
   if(ch!=null&&Math.abs(ch)>=5){var n=pts.length;
     return 'Your average run is <b>'+Math.abs(ch)+'% '+(ch>0?'longer':'shorter')+'</b> than 12 weeks ago ('+fmt((pts[0].v+pts[1].v)/2)+' km to '+fmt((pts[n-1].v+pts[n-2].v)/2)+' km).'}
-  var d=pace(C.yr);
-  return 'At this rate you’ll finish the year on <b>'+Math.round(C.yr.proj)+' km</b>.';
+  if(!S.runs.length)return 'Tap <b>+</b> after your first run. Your streak, weekly progress and trends build from there.';
+  if(!C.yr.settled)return 'You&rsquo;ve logged <b>'+S.runs.length+' run'+(S.runs.length>1?'s':'')+'</b> so far. Trends and projections appear after a couple of weeks.';
+  return 'At this rate you&rsquo;ll finish the year on <b>'+Math.round(C.yr.proj)+' km</b>.';
 }
 
 /* ---------- PROGRESS tab ---------- */
@@ -344,10 +334,15 @@ function renderProgress(C){
   $('progSub').textContent=short(C.today);
   track('trWeek','This week',{km:C.wk,target:S.weekly,frac:C.wkFrac},'');
   track('trMonth',MON[C.today.getMonth()],C.mo,'');
-  track('trYear',C.yr.label,C.yr,C.yr.since?'Counted from your first run on '+short(C.yr.since)+'. On track for '+Math.round(C.yr.proj)+' km.':'On track for '+Math.round(C.yr.proj)+' km.');
+  var proj=C.yr.settled?' On track for '+Math.round(C.yr.proj)+' km.':'';
+  track('trYear',C.yr.label,C.yr,C.yr.since?'Counted from your first run on '+short(C.yr.since)+'.'+proj:proj.trim());
   weeklyChart(C);avgChart(C);
 }
 function track(id,label,o,note){
+  if(!S.runs.length){
+    $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">0 <small>/ '+Math.round(o.target)+' km</small></span></div><div class="rail"></div><div class="p meh">Starts with your first run</div>';
+    return;
+  }
   var d=pace(o);
   $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">'+fmt(o.km,0)+' <small>/ '+Math.round(o.target)+' km</small></span></div>'+
     '<div class="rail"><i style="width:'+Math.min(100,o.km/o.target*100)+'%"></i><b style="left:calc('+Math.min(100,o.frac*100)+'% - 1.5px)"></b></div>'+
@@ -361,6 +356,7 @@ function weekAvgs(mon){
 }
 
 function weeklyChart(C){
+  if(!S.runs.length){$('weeklyChart').innerHTML='<p class="meh">Your weekly totals appear here after your first run.</p>';return}
   var ws=weeks(C.mon,12),vals=ws.map(function(w){return sumRange(C.m,w,addDays(w,6))});
   var W=340,H=180,L=26,B=22,T=12,max=Math.max(S.weekly*1.2,Math.max.apply(null,vals)*1.08);
   var bw=(W-L)/12,y=function(v){return T+(H-T-B)*(1-v/max)};
@@ -382,7 +378,7 @@ function weeklyChart(C){
 function avgChart(C){
   var ws=weeks(C.mon,12),a=weekAvgs(C.mon),pts=[];a.forEach(function(p,i){if(p){p.i=i;pts.push(p)}});
   var el=$('avgChart');
-  if(pts.length<2){el.innerHTML='<p class="meh">Needs a couple of weeks of runs.</p>';$('avgNote').textContent='';return}
+  if(pts.length<2){el.innerHTML='<p class="meh">Your average run distance appears here after a couple of weeks.</p>';$('avgNote').textContent='';return}
   var W=340,H=160,L=26,B=22,T=24,vs=pts.map(function(p){return p.v});
   var lo=Math.floor(Math.min.apply(null,vs)-0.5),hi=Math.ceil(Math.max.apply(null,vs)+0.5),step=(W-L-10)/11;
   var x=function(i){return L+5+i*step},y=function(v){return T+(H-T-B)*(1-(v-lo)/(hi-lo))};
@@ -420,13 +416,13 @@ function renderRecords(C){
   Object.keys(m).forEach(function(k){var w=key(monday(parse(k)));wk[w]=(wk[w]||0)+m[k];mo[k.slice(0,7)]=(mo[k.slice(0,7)]||0)+m[k]});
   function top(o){var b=null;Object.keys(o).forEach(function(k){if(!b||o[k]>o[b])b=k});return b}
   var bw=top(wk),bm=top(mo),total=S.runs.reduce(function(a,r){return a+r.km},0);
-  $('recSub').textContent=S.runs.length+' runs';
-  var h='<div class="best hl"><div class="n">'+fmt(total,0)+' km</div><div class="l">All-time total across '+S.runs.length+' runs</div></div>';
+  var nr=S.runs.length+' run'+(S.runs.length===1?'':'s');$('recSub').textContent=nr;
+  var h='<div class="best hl"><div class="n">'+fmt(total,0)+' km</div><div class="l">All-time total across '+nr+'</div></div>';
   if(longest.km)h+='<div class="best"><div class="n">'+fmt(longest.km,2)+'</div><div class="l">Longest run (km), '+short(parse(longest.date))+'</div></div>';
   if(bw)h+='<div class="best"><div class="n">'+fmt(wk[bw])+'</div><div class="l">Best week (km), '+short(parse(bw))+'</div></div>';
   if(bm)h+='<div class="best"><div class="n">'+fmt(mo[bm],0)+'</div><div class="l">Best month (km), '+MON[+bm.slice(5)-1]+'</div></div>';
   h+='<div class="best"><div class="n">'+C.bestStreak+'</div><div class="l">Longest weekday streak</div></div>';
-  $('bests').innerHTML=h;
+  $('bests').innerHTML=S.runs.length?h:'<p class="meh" style="grid-column:span 2;margin:0">Your longest run, best week, best month and longest streak appear here once you start logging.</p>';
 
   /* history grouped by week, newest first */
   var groups={};S.runs.forEach(function(r){var w=key(monday(parse(r.date)));(groups[w]=groups[w]||[]).push(r)});
@@ -462,7 +458,6 @@ $('saveRun').onclick=function(){var km=parseFloat($('inKm').value),dt=$('inDate'
   S.runs.push({date:dt,km:+km.toFixed(2),src:'manual'});save();close();setTab('week');render()};
 $('openSettings').onclick=function(){$('inWeek').value=S.weekly;$('inYear').value=S.yearly;open('setSheet')};
 $('saveSet').onclick=function(){var w=parseFloat($('inWeek').value),y=parseFloat($('inYear').value);if(w>0)S.weekly=w;if(y>0)S.yearly=y;save();close();render()};
-$('clearSample').onclick=function(){if(!confirm('Remove the sample runs and start fresh?'))return;S.runs=S.runs.filter(function(r){return r.src!=='sample'});S.sample=false;save();render()};
 $('openSync').onclick=function(){alert('Coming next: an iPhone Shortcut copies your runs from Apple Health, and this button pulls them in.')};
 $('exportBtn').onclick=function(){var blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='run-log-backup-'+key(new Date())+'.json';a.click()};
