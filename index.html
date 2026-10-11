@@ -468,6 +468,8 @@ $('exportBtn').onclick=function(){var blob=new Blob([JSON.stringify(S,null,1)],{
   a.href=URL.createObjectURL(blob);a.download='run-log-backup-'+key(new Date())+'.json';a.click()};
 
 render();
+/* iPhone often resumes a backgrounded app without reloading it, so redraw whenever it comes back on screen. Keeps the date and week current. */
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')render()});
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(function(){});
 })();
 </script>
