@@ -1,14 +1,27 @@
 {
-  "name": "Run Log",
-  "short_name": "Run Log",
+  "name": "Adam's Running Tracker",
+  "short_name": "Adam's Running Tracker",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#F6F4F4",
   "theme_color": "#C53A3A",
   "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
-    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

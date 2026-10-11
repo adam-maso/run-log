@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Run Log</title>
+<title>Adam's Running Tracker</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#C53A3A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Run Log">
+<meta name="apple-mobile-web-app-title" content="Adam's Running Tracker">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -37,7 +37,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 64px;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
 .topbar{display:flex;align-items:center;justify-content:space-between;height:44px}
 .brand{font-weight:800;font-size:17px;letter-spacing:-.2px}
-.brand span{font-weight:500;opacity:.85;margin-left:8px;font-size:14px}
+.brand span{display:block;font-weight:500;opacity:.85;font-size:13px;margin-top:1px}
 .iconbtn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14)}
 .iconbtn svg{width:21px;height:21px;stroke:#fff}
 .chip{display:inline-flex;gap:8px;align-items:center;margin-top:6px;background:rgba(0,0,0,.2);border-radius:20px;padding:5px 6px 5px 12px;font-size:12.5px}
@@ -160,7 +160,7 @@ body.open .scrim{opacity:1;pointer-events:auto}
 <section class="tab on" id="t-week">
   <div class="hero">
     <div class="wrap">
-      <div class="topbar"><div class="brand">Run Log<span id="todayLbl"></span></div>
+      <div class="topbar"><div class="brand">Adam&rsquo;s Running Tracker<span id="todayLbl"></span></div>
         <button class="iconbtn" id="openSettings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
       <div id="sampleChip" class="chip" hidden>Sample data <button id="clearSample">Clear</button></div>
       <div class="ringwrap">
