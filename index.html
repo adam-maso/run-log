@@ -401,7 +401,7 @@ function weeklyChart(C){
     if(i%3===2||cur)s+='<text x="'+(L+i*bw+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+(cur?'Now':short(ws[i]))+'</text>';
   });
   s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(S.weekly)+'" y2="'+y(S.weekly)+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 4"/>';
-  s+='<text class="halo" x="'+(L+4)+'" y="'+(y(S.weekly)-6)+'" style="fill:var(--ink);font-weight:700">Target '+S.weekly+'</text></svg><div class="tip"></div>';
+  s+='</svg><div class="tip"></div>';
   var el=$('weeklyChart');el.innerHTML=s;
   hover(el,function(i){return {x:L+i*bw+bw/2,y:y(vals[i]),html:'<b>'+fmt(vals[i])+' km</b>'+(vals[i]-rv[i]>0.005?fmt(rv[i])+' run, '+fmt(vals[i]-rv[i])+' walk<br>':'')+'Week of '+short(ws[i])+(i===11?' (so far)':vals[i]>=S.weekly?', target hit':'')}},W);
 }
