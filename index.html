@@ -121,7 +121,9 @@ h2 span{text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;colo
 .run{display:flex;align-items:center;justify-content:space-between;padding:10px 2px;border-bottom:1px solid var(--line)}
 .run .d{color:var(--ink2);font-size:14.5px}
 .run .k{font-weight:700;font-variant-numeric:tabular-nums}
-.run .x{color:var(--muted);font-size:20px;padding:0 2px 0 14px;line-height:1}
+.run{width:100%;text-align:left;font:inherit;color:inherit}
+.run .chev{color:var(--muted);font-size:20px;padding:0 2px 0 12px;line-height:1}
+.danger{width:100%;background:none;color:var(--red);font-weight:700;padding:13px;margin-top:4px}
 .more{display:block;width:100%;margin:16px 0 8px;padding:12px;border-radius:14px;background:var(--surface);font-weight:700}
 
 /* ---------- tab bar + add button ---------- */
@@ -219,11 +221,12 @@ body.open .scrim{opacity:1;pointer-events:auto}
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="addSheet" role="dialog" aria-label="Add a run or walk">
-  <h3>Add activity</h3>
+  <h3 id="addTitle">Add activity</h3>
   <div class="seg" role="group" aria-label="Activity type"><button type="button" data-type="run" class="on">Run</button><button type="button" data-type="walk">Walk</button></div>
   <div class="field bigkm"><input id="inKm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.0" aria-label="Distance in km"></div>
   <div class="field"><label for="inDate">Date</label><input id="inDate" type="date"></div>
   <button class="primary" id="saveRun">Save run</button>
+  <button class="danger" id="delEntry" hidden>Delete</button>
 </div>
 <div class="sheet" id="setSheet" role="dialog" aria-label="Settings">
   <h3>Goals</h3>
@@ -250,7 +253,8 @@ function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x}
 function monday(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());return addDays(x,-((x.getDay()+6)%7))}
 function isWeekday(d){var w=d.getDay();return w>0&&w<6}
 function short(d){return d.getDate()+' '+MON[d.getMonth()]}
-function fmt(n,dp){dp=dp==null?1:dp;return (Math.round(n*Math.pow(10,dp))/Math.pow(10,dp)).toFixed(dp)}
+/* Distances show as whole km everywhere (Adam's call). The exact figure typed is still what's stored. */
+function fmt(n){return ''+Math.round(n)}
 function $(id){return document.getElementById(id)}
 
 /* ---------- state ---------- */
@@ -334,7 +338,7 @@ function renderWeek(C){
   $('stStreak').innerHTML=C.streak+'<small>days</small>';
   $('stStreakP').textContent=C.streak>=C.bestStreak&&C.streak>0?'Best ever':'Best '+C.bestStreak;
   var moList=S.runs.filter(function(r){return r.date.slice(0,7)===tk.slice(0,7)});
-  $('stMoL').textContent=C.mo.label;$('stMo').innerHTML=fmt(C.mo.km,0)+'<small>km</small>';
+  $('stMoL').textContent=C.mo.label;$('stMo').innerHTML=fmt(C.mo.km)+'<small>km</small>';
   $('stMoP').className='p meh';$('stMoP').textContent=tally(moList);
   $('insightTxt').innerHTML=insight(C);
 }
@@ -366,7 +370,7 @@ function track(id,label,o,note){
     return;
   }
   var d=pace(o);
-  $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">'+fmt(o.km,0)+' <small>/ '+Math.round(o.target)+' km</small></span></div>'+
+  $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">'+fmt(o.km)+' <small>/ '+Math.round(o.target)+' km</small></span></div>'+
     '<div class="rail"><i style="width:'+Math.min(100,o.km/o.target*100)+'%"></i><b style="left:calc('+Math.min(100,o.frac*100)+'% - 1.5px)"></b></div>'+
     '<div class="p '+(d>=0?'ahead':'behind')+'">'+(d>=0?'▲ ':'▼ ')+fmt(Math.abs(d))+' km '+(d>=0?'ahead of':'behind')+' pace'+(note?'<span class="meh" style="font-weight:500"> &middot; '+note+'</span>':'')+'</div>';
 }
@@ -410,7 +414,7 @@ function avgChart(C){
   var lo=Math.floor(Math.min.apply(null,vs)-0.5),hi=Math.ceil(Math.max.apply(null,vs)+0.5),step=(W-L-10)/11;
   var x=function(i){return L+5+i*step},y=function(v){return T+(H-T-B)*(1-(v-lo)/(hi-lo))};
   var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Average run distance per week">';
-  [lo,(lo+hi)/2,hi].forEach(function(v){s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--grid)"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmt(v,v%1?1:0)+'</text>'});
+  [lo,(lo+hi)/2,hi].filter(function(v){return v%1===0}).forEach(function(v){s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--grid)"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmt(v)+'</text>'});
   var line=pts.map(function(p,k){return (k?'L':'M')+x(p.i)+','+y(p.v)}).join('');
   s+='<path d="'+line+'L'+x(pts[pts.length-1].i)+','+(H-B)+'L'+x(pts[0].i)+','+(H-B)+'Z" fill="var(--red)" opacity=".08"/>';
   s+='<path d="'+line+'" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
@@ -444,11 +448,11 @@ function renderRecords(C){
   function top(o){var b=null;Object.keys(o).forEach(function(k){if(!b||o[k]>o[b])b=k});return b}
   var bw=top(wk),bm=top(mo),total=S.runs.reduce(function(a,r){return a+r.km},0);
   var nr=tally(S.runs);$('recSub').textContent=nr;
-  var h='<div class="best hl"><div class="n">'+fmt(total,0)+' km</div><div class="l">All-time total across '+nr+'</div></div>';
-  if(longest.km)h+='<div class="best"><div class="n">'+fmt(longest.km,2)+'</div><div class="l">Longest run (km), '+short(parse(longest.date))+'</div></div>';
-  if(longWalk.km)h+='<div class="best"><div class="n">'+fmt(longWalk.km,2)+'</div><div class="l">Longest walk (km), '+short(parse(longWalk.date))+'</div></div>';
+  var h='<div class="best hl"><div class="n">'+fmt(total)+' km</div><div class="l">All-time total across '+nr+'</div></div>';
+  if(longest.km)h+='<div class="best"><div class="n">'+fmt(longest.km)+'</div><div class="l">Longest run (km), '+short(parse(longest.date))+'</div></div>';
+  if(longWalk.km)h+='<div class="best"><div class="n">'+fmt(longWalk.km)+'</div><div class="l">Longest walk (km), '+short(parse(longWalk.date))+'</div></div>';
   if(bw)h+='<div class="best"><div class="n">'+fmt(wk[bw])+'</div><div class="l">Best week (km), '+short(parse(bw))+'</div></div>';
-  if(bm)h+='<div class="best"><div class="n">'+fmt(mo[bm],0)+'</div><div class="l">Best month (km), '+MON[+bm.slice(5)-1]+'</div></div>';
+  if(bm)h+='<div class="best"><div class="n">'+fmt(mo[bm])+'</div><div class="l">Best month (km), '+MON[+bm.slice(5)-1]+'</div></div>';
   h+='<div class="best"><div class="n">'+C.bestStreak+'</div><div class="l">Longest weekday streak</div></div>';
   $('bests').innerHTML=S.runs.length?h:'<p class="meh" style="grid-column:span 2;margin:0">Your longest run and walk, best week, best month and longest streak appear here once you start logging.</p>';
 
@@ -458,7 +462,7 @@ function renderRecords(C){
   ks.slice(0,weeksShown).forEach(function(w){
     var rs=groups[w].sort(function(a,b){return a.date<b.date?1:-1}),t=rs.reduce(function(a,r){return a+r.km},0),cur=w===key(C.mon);
     out+='<div class="wk"><div class="wkhead"><span class="t">'+(cur?'This week':'Week of '+short(parse(w)))+'</span><span class="s'+(t>=S.weekly?' hit':'')+'">'+fmt(t)+' / '+S.weekly+' km</span></div>';
-    rs.forEach(function(r){var d=parse(r.date);out+='<div class="run"><span class="d">'+WD[d.getDay()]+' '+short(d)+'<span class="tag">'+(isWalk(r)?'Walk':'Run')+'</span></span><span><span class="k">'+fmt(r.km,2)+' km</span><button class="x" data-date="'+r.date+'" data-km="'+r.km+'" data-type="'+(isWalk(r)?'walk':'run')+'" aria-label="Delete entry">&times;</button></span></div>'});
+    rs.forEach(function(r){var d=parse(r.date);out+='<button class="run" data-i="'+S.runs.indexOf(r)+'" aria-label="Edit '+(isWalk(r)?'walk':'run')+' on '+short(d)+'"><span class="d">'+WD[d.getDay()]+' '+short(d)+'<span class="tag">'+(isWalk(r)?'Walk':'Run')+'</span></span><span><span class="k">'+fmt(r.km)+' km</span><span class="chev">&rsaquo;</span></span></button>'});
     out+='</div>';
   });
   $('history').innerHTML=out||'<p class="meh">Nothing logged yet. Tap + to add a run or walk.</p>';
@@ -474,20 +478,26 @@ function setTab(t){
 }
 document.querySelectorAll('.tb[data-tab]').forEach(function(b){b.onclick=function(){setTab(b.dataset.tab)}});
 
-$('history').addEventListener('click',function(e){var b=e.target.closest('.x');if(!b||!confirm('Delete this '+b.dataset.type+'?'))return;
-  var i=S.runs.findIndex(function(r){return r.date===b.dataset.date&&r.km===+b.dataset.km&&(isWalk(r)?'walk':'run')===b.dataset.type});if(i>-1){S.runs.splice(i,1);save();render()}});
+/* Tap an entry in History to edit or delete it */
+$('history').addEventListener('click',function(e){var b=e.target.closest('.run');if(!b)return;var r=S.runs[+b.dataset.i];if(!r)return;
+  editIdx=+b.dataset.i;setType(isWalk(r)?'walk':'run');$('inKm').value=r.km;$('inDate').value=r.date;
+  $('addTitle').textContent='Edit '+(isWalk(r)?'walk':'run');$('saveRun').textContent='Save changes';$('delEntry').hidden=false;open('addSheet')});
 $('showMore').onclick=function(){weeksShown+=8;renderRecords(compute())};
 
 function open(id){document.body.classList.add('open');$(id).classList.add('show')}
 function close(){document.body.classList.remove('open');document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('show')})}
-$('scrim').onclick=close;
-var addType='run';
-function setType(t){addType=t;document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('on',b.dataset.type===t)});$('saveRun').textContent=t==='walk'?'Save walk':'Save run'}
+$('scrim').onclick=function(){editIdx=-1;close()};
+var addType='run',editIdx=-1;
+function setType(t){addType=t;document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('on',b.dataset.type===t)});if(editIdx<0)$('saveRun').textContent=t==='walk'?'Save walk':'Save run'}
 document.querySelectorAll('.seg button').forEach(function(b){b.onclick=function(){setType(b.dataset.type)}});
-$('openAdd').onclick=function(){setType('run');$('inDate').value=key(new Date());$('inKm').value='';open('addSheet');setTimeout(function(){$('inKm').focus()},280)};
+$('openAdd').onclick=function(){editIdx=-1;$('addTitle').textContent='Add activity';$('delEntry').hidden=true;setType('run');$('inDate').value=key(new Date());$('inKm').value='';open('addSheet');setTimeout(function(){$('inKm').focus()},280)};
 $('saveRun').onclick=function(){var km=parseFloat($('inKm').value),dt=$('inDate').value;if(!(km>0)||!dt)return;
+  if(editIdx>=0){var r=S.runs[editIdx];r.date=dt;r.km=+km.toFixed(2);if(addType==='walk')r.type='walk';else delete r.type;
+    editIdx=-1;save();close();render();return}
   var e={date:dt,km:+km.toFixed(2),src:'manual'};if(addType==='walk')e.type='walk';
   S.runs.push(e);save();close();setTab('week');render()};
+$('delEntry').onclick=function(){var r=S.runs[editIdx];if(!r||!confirm('Delete this '+(isWalk(r)?'walk':'run')+' on '+short(parse(r.date))+'?'))return;
+  S.runs.splice(editIdx,1);editIdx=-1;save();close();render()};
 $('tabSettings').onclick=function(){$('inWeek').value=S.weekly;$('inYear').value=S.yearly;open('setSheet')};
 $('saveSet').onclick=function(){var w=parseFloat($('inWeek').value),y=parseFloat($('inYear').value);if(w>0)S.weekly=w;if(y>0)S.yearly=y;save();close();render()};
 $('exportBtn').onclick=function(){var blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');
