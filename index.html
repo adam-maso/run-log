@@ -15,12 +15,12 @@
 <style>
 :root{
   --bg:#F6F4F4; --surface:#FFFFFF; --ink:#16130F; --ink2:#4E4A47; --muted:#857F7B; --line:#E7E2E0; --grid:#EEEAE8;
-  --red:#C53A3A; --red-deep:#8E0E16; --red-soft:#FBE3E3; --good:#1E8A4A; --warn:#B26A00;
+  --red:#C53A3A; --walk:#E9A6A6; --red-deep:#8E0E16; --red-soft:#FBE3E3; --good:#1E8A4A; --warn:#B26A00;
   --hero:#C53A3A;
 }
 @media (prefers-color-scheme: dark){
   :root{--bg:#100E0E; --surface:#1B1818; --ink:#F4F1F0; --ink2:#C2BCB9; --muted:#8F8885; --line:#2D2828; --grid:#262121;
-    --red:#EE6262; --red-soft:#3A1616; --good:#43C37A; --warn:#E6A23C; --hero:#A82E31}
+    --red:#EE6262; --walk:#9C5555; --red-soft:#3A1616; --good:#43C37A; --warn:#E6A23C; --hero:#A82E31}
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
@@ -44,7 +44,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .ringwrap circle{fill:none;stroke-width:16;stroke-linecap:round}
 .ring-track{stroke:rgba(255,255,255,.18)}
 .ring-fill{stroke:#fff;transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
-.ring-over{stroke:#FFD2D2}
+.ring-walk{stroke:rgba(255,255,255,.5);transition:stroke-dasharray .8s cubic-bezier(.2,.8,.2,1),stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.split{font-size:12.5px;margin-top:6px;opacity:.95;display:flex;gap:10px;justify-content:center}
+.split i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:5px;vertical-align:0}
+.split i.w{background:rgba(255,255,255,.5)}
 .ringtext{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ringtext .n{font-size:60px;font-weight:800;letter-spacing:-2.5px;line-height:1}
 .ringtext .of{font-size:15px;opacity:.85;font-weight:600;margin-top:4px}
@@ -58,6 +61,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .day .v{font-size:16px;font-weight:800;margin-top:3px;height:24px;display:flex;align-items:center;justify-content:center}
 .day .tick{width:22px;height:22px;border-radius:50%;border:2px dashed var(--line)}
 .day.done{color:var(--red);box-shadow:inset 0 -4px 0 var(--red),0 8px 24px rgba(60,10,10,.12)}
+.day.walkday{color:var(--ink2);box-shadow:inset 0 -4px 0 var(--walk),0 8px 24px rgba(60,10,10,.12)}
 .day.today{outline:2.5px solid var(--red);outline-offset:2px}
 .day.future .tick{border-style:solid;border-color:var(--grid)}
 
@@ -147,6 +151,12 @@ body.open .scrim{opacity:1;pointer-events:auto}
 .bigkm input{font-size:40px;font-weight:800;text-align:center;letter-spacing:-1px;padding:16px}
 .row{display:flex;gap:10px}.row>*{flex:1}
 .hint{font-size:13px;color:var(--muted);margin:-4px 0 14px}
+.seg{display:flex;background:var(--bg);border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;padding:11px;border-radius:11px;font-weight:700;color:var(--ink2)}
+.seg button.on{background:var(--red);color:#fff}
+.tag{font-size:11.5px;font-weight:700;color:var(--muted);margin-left:8px;text-transform:uppercase;letter-spacing:.5px}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink2);margin:-4px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .primary{width:100%;background:var(--red);color:#fff;font-weight:800;font-size:16px;padding:15px;border-radius:16px}
 .secondary{width:100%;background:var(--bg);font-weight:700;padding:13px;border-radius:14px;margin-top:8px}
 </style>
@@ -159,8 +169,8 @@ body.open .scrim{opacity:1;pointer-events:auto}
     <div class="wrap">
       <div class="topbar"><div class="brand">Adam&rsquo;s Running Tracker<span id="todayLbl"></span></div></div>
       <div class="ringwrap">
-        <svg viewBox="0 0 230 230"><circle class="ring-track" cx="115" cy="115" r="96"/><circle class="ring-fill" id="ring" cx="115" cy="115" r="96"/></svg>
-        <div class="ringtext"><div class="n" id="wkKm">0</div><div class="of" id="wkOf"></div></div>
+        <svg viewBox="0 0 230 230"><circle class="ring-track" cx="115" cy="115" r="96"/><circle class="ring-walk" id="ringWalk" cx="115" cy="115" r="96"/><circle class="ring-fill" id="ring" cx="115" cy="115" r="96"/></svg>
+        <div class="ringtext"><div class="n" id="wkKm">0</div><div class="of" id="wkOf"></div><div class="split" id="wkSplit" hidden></div></div>
       </div>
       <p class="herosub" id="wkSub"></p>
     </div>
@@ -183,6 +193,7 @@ body.open .scrim{opacity:1;pointer-events:auto}
   <div class="track" id="trMonth"></div>
   <div class="track" id="trYear"></div>
   <h2>Weekly km <span>last 12 weeks</span></h2>
+  <div class="legend" id="wkLegend" hidden><span><i style="background:var(--red)"></i>Run</span><span><i style="background:var(--walk)"></i>Walk</span></div>
   <div class="chart" id="weeklyChart"></div>
   <h2>Average run <span id="avgNote"></span></h2>
   <div class="chart" id="avgChart"></div>
@@ -201,14 +212,15 @@ body.open .scrim{opacity:1;pointer-events:auto}
 <nav class="tabbar"><div class="in">
   <button class="tb on" data-tab="week"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Week</button>
   <button class="tb" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress</button>
-  <button class="add" id="openAdd" aria-label="Add a run"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="add" id="openAdd" aria-label="Add a run or walk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="tb" data-tab="records"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Records</button>
   <button class="tb" id="tabSettings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Settings</button>
 </div></nav>
 
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="addSheet" role="dialog" aria-label="Add a run">
-  <h3>Add a run</h3>
+<div class="sheet" id="addSheet" role="dialog" aria-label="Add a run or walk">
+  <h3>Add activity</h3>
+  <div class="seg" role="group" aria-label="Activity type"><button type="button" data-type="run" class="on">Run</button><button type="button" data-type="walk">Walk</button></div>
   <div class="field bigkm"><input id="inKm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.0" aria-label="Distance in km"></div>
   <div class="field"><label for="inDate">Date</label><input id="inDate" type="date"></div>
   <button class="primary" id="saveRun">Save run</button>
@@ -245,13 +257,21 @@ function $(id){return document.getElementById(id)}
 function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.runs)return s}catch(e){}return null}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 var S=load();
-if(!S){S={weekly:35,yearly:1800,runs:[]};save()}
+if(!S){S={weekly:50,yearly:2600,runs:[],m50:1};save()}
+/* One-time, Oct 2026: walks added and the target moved from 35 to 50 km a week (2,600 a year). Only changes the old defaults. */
+if(!S.m50){if(S.weekly===35)S.weekly=50;if(S.yearly===1800)S.yearly=2600;S.m50=1;save()}
 if(S.sample!=null||S.runs.some(function(r){return r.src==='sample'})){S.runs=S.runs.filter(function(r){return r.src!=='sample'});delete S.sample;save()}
 /* Preview only: ?today=2026-10-07 shows the app as it looked on that day. Nothing is saved in this mode. */
 var PREVIEW=(location.search.match(/today=(\d{4}-\d{2}-\d{2})/)||[])[1];
 if(PREVIEW){S=JSON.parse(JSON.stringify(S));S.runs=S.runs.filter(function(r){return r.date<=PREVIEW});save=function(){}}
 
 
+/* Entries are runs unless marked as walks (everything logged before walks existed is a run) */
+function isWalk(r){return r.type==='walk'}
+function runsOnly(){return S.runs.filter(function(r){return !isWalk(r)})}
+function tally(list){var r=0,w=0;list.forEach(function(x){isWalk(x)?w++:r++});
+  var a=[];if(r||!w)a.push(r+' run'+(r===1?'':'s'));if(w)a.push(w+' walk'+(w===1?'':'s'));return a.join(' and ')}
+function sumBy(list,from,to){var f=key(from),t=key(to);return list.reduce(function(a,r){return a+(r.date>=f&&r.date<=t?r.km:0)},0)}
 function kmByDay(){var m={};S.runs.forEach(function(r){m[r.date]=(m[r.date]||0)+r.km});return m}
 function sumRange(m,from,to){var t=0;for(var d=new Date(from);d<=to;d=addDays(d,1))t+=m[key(d)]||0;return t}
 function todayD(){if(PREVIEW)return parse(PREVIEW);var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
@@ -259,7 +279,7 @@ function todayD(){if(PREVIEW)return parse(PREVIEW);var n=new Date();return new D
 /* All the numbers every tab needs, worked out once */
 function compute(){
   var m=kmByDay(),today=todayD(),tk=key(today),mon=monday(today),C={m:m,today:today,mon:mon};
-  C.wk=sumRange(m,mon,addDays(mon,6));
+  C.wk=sumRange(m,mon,addDays(mon,6));C.wkRun=sumBy(runsOnly(),mon,addDays(mon,6));C.wkWalk=C.wk-C.wkRun;
   C.left=0;for(var i=0;i<5;i++){var dd=addDays(mon,i);if(dd>today||(key(dd)===tk&&!m[tk]))C.left++}
   var st=0,d=new Date(today);if(!m[tk])d=addDays(d,-1);
   while(true){if(!isWeekday(d)){d=addDays(d,-1);continue}if(!m[key(d)])break;st++;d=addDays(d,-1)}
@@ -288,29 +308,34 @@ function bestStreak(m){
 function renderWeek(C){
   var m=C.m,tk=key(C.today);
   $('todayLbl').textContent=WD[C.today.getDay()]+' '+short(C.today);
-  var circ=2*Math.PI*96,f=Math.min(1,C.wk/S.weekly),ring=$('ring');
+  /* Run arc first, walk arc continues from where it ends, both capped at a full ring */
+  var circ=2*Math.PI*96,fr=Math.min(1,C.wkRun/S.weekly),fw=Math.max(0,Math.min(1,C.wk/S.weekly)-fr),ring=$('ring'),rw=$('ringWalk');
   ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ;
-  requestAnimationFrame(function(){requestAnimationFrame(function(){ring.style.strokeDashoffset=circ*(1-f)})});
+  rw.style.display=fw>0?'':'none';rw.style.strokeDasharray='0 '+circ;rw.style.strokeDashoffset=-circ*fr;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){ring.style.strokeDashoffset=circ*(1-fr);rw.style.strokeDasharray=(circ*fw)+' '+circ})});
+  $('wkSplit').hidden=!C.wkWalk;
+  $('wkSplit').innerHTML='<span><i></i>'+fmt(C.wkRun)+' run</span><span><i class="w"></i>'+fmt(C.wkWalk)+' walk</span>';
   $('wkKm').textContent=fmt(C.wk);
   $('wkOf').textContent='of '+S.weekly+' km this week';
   var togo=Math.max(0,S.weekly-C.wk),sub;
-  if(!S.runs.length)sub='Your first week starts here. Tap <b>+</b> after a run.';
+  if(!S.runs.length)sub='Your first week starts here. Tap <b>+</b> after a run or walk.';
   else if(togo<=0)sub='<b>Target smashed.</b> Everything from here is a bonus.';
-  else if(C.left===0)sub='<b>'+fmt(togo)+' km</b> short. A weekend run would close it.';
-  else sub='<b>'+fmt(togo)+' km</b> to go &middot; '+C.left+' weekday'+(C.left>1?'s':'')+' left &middot; <b>'+fmt(togo/C.left)+' km</b> a run';
+  else if(C.left===0)sub='<b>'+fmt(togo)+' km</b> short. A weekend run or walk would close it.';
+  else sub='<b>'+fmt(togo)+' km</b> to go &middot; '+C.left+' weekday'+(C.left>1?'s':'')+' left &middot; <b>'+fmt(togo/C.left)+' km</b> a day';
   $('wkSub').innerHTML=sub;
+  var runDays={};runsOnly().forEach(function(r){runDays[r.date]=1});
   var h='';['M','T','W','T','F'].forEach(function(l,i){
     var dd=addDays(C.mon,i),k=key(dd),c='day';
-    if(m[k])c+=' done';else if(dd>C.today)c+=' future';
+    if(m[k])c+=runDays[k]?' done':' walkday';else if(dd>C.today)c+=' future';
     if(k===tk)c+=' today';
     h+='<div class="'+c+'"><div class="l">'+l+'</div><div class="v">'+(m[k]?fmt(m[k]):'<span class="tick"></span>')+'</div></div>';
   });
   $('wkDays').innerHTML=h;
   $('stStreak').innerHTML=C.streak+'<small>days</small>';
   $('stStreakP').textContent=C.streak>=C.bestStreak&&C.streak>0?'Best ever':'Best '+C.bestStreak;
-  var moRuns=S.runs.filter(function(r){return r.date.slice(0,7)===tk.slice(0,7)}).length;
+  var moList=S.runs.filter(function(r){return r.date.slice(0,7)===tk.slice(0,7)});
   $('stMoL').textContent=C.mo.label;$('stMo').innerHTML=fmt(C.mo.km,0)+'<small>km</small>';
-  $('stMoP').className='p meh';$('stMoP').textContent=moRuns+' run'+(moRuns===1?'':'s');
+  $('stMoP').className='p meh';$('stMoP').textContent=tally(moList);
   $('insightTxt').innerHTML=insight(C);
 }
 
@@ -321,8 +346,8 @@ function insight(C){
   var pts=weekAvgs(C.mon).filter(function(p){return p}),ch=avgChange(pts);
   if(ch!=null&&Math.abs(ch)>=5){var n=pts.length;
     return 'Your average run is <b>'+Math.abs(ch)+'% '+(ch>0?'longer':'shorter')+'</b> than 12 weeks ago ('+fmt((pts[0].v+pts[1].v)/2)+' km to '+fmt((pts[n-1].v+pts[n-2].v)/2)+' km).'}
-  if(!S.runs.length)return 'Tap <b>+</b> after your first run. Your streak, weekly progress and trends build from there.';
-  if(!C.yr.settled)return 'You&rsquo;ve logged <b>'+S.runs.length+' run'+(S.runs.length>1?'s':'')+'</b> so far. Trends and projections appear after a couple of weeks.';
+  if(!S.runs.length)return 'Tap <b>+</b> after your first run or walk. Your streak, weekly progress and trends build from there.';
+  if(!C.yr.settled)return 'You&rsquo;ve logged <b>'+tally(S.runs)+'</b> so far. Trends and projections appear after a couple of weeks.';
   return 'At this rate you&rsquo;ll finish the year on <b>'+Math.round(C.yr.proj)+' km</b>.';
 }
 
@@ -332,12 +357,12 @@ function renderProgress(C){
   track('trWeek','This week',{km:C.wk,target:S.weekly,frac:C.wkFrac},'');
   track('trMonth',MON[C.today.getMonth()],C.mo,'');
   var proj=C.yr.settled?' On track for '+Math.round(C.yr.proj)+' km.':'';
-  track('trYear',C.yr.label,C.yr,C.yr.since?'Counted from your first run on '+short(C.yr.since)+'.'+proj:proj.trim());
+  track('trYear',C.yr.label,C.yr,C.yr.since?'Counted from your first entry on '+short(C.yr.since)+'.'+proj:proj.trim());
   weeklyChart(C);avgChart(C);
 }
 function track(id,label,o,note){
   if(!S.runs.length){
-    $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">0 <small>/ '+Math.round(o.target)+' km</small></span></div><div class="rail"></div><div class="p meh">Starts with your first run</div>';
+    $(id).innerHTML='<div class="top"><span class="t">'+label+'</span><span class="n">0 <small>/ '+Math.round(o.target)+' km</small></span></div><div class="rail"></div><div class="p meh">Starts with your first run or walk</div>';
     return;
   }
   var d=pace(o);
@@ -348,28 +373,33 @@ function track(id,label,o,note){
 
 function weeks(mon,n){var a=[];for(var i=n-1;i>=0;i--)a.push(addDays(mon,-7*i));return a}
 function weekAvgs(mon){
-  return weeks(mon,12).map(function(w){var s=key(w),e=key(addDays(w,6)),rs=S.runs.filter(function(r){return r.date>=s&&r.date<=e});
+  return weeks(mon,12).map(function(w){var s=key(w),e=key(addDays(w,6)),rs=runsOnly().filter(function(r){return r.date>=s&&r.date<=e});
     return rs.length?{v:rs.reduce(function(a,r){return a+r.km},0)/rs.length,n:rs.length,w:w}:null});
 }
 
 function weeklyChart(C){
-  if(!S.runs.length){$('weeklyChart').innerHTML='<p class="meh">Your weekly totals appear here after your first run.</p>';return}
-  var ws=weeks(C.mon,12),vals=ws.map(function(w){return sumRange(C.m,w,addDays(w,6))});
+  $('wkLegend').hidden=!S.runs.some(isWalk);
+  if(!S.runs.length){$('weeklyChart').innerHTML='<p class="meh">Your weekly totals appear here after your first run or walk.</p>';return}
+  var ws=weeks(C.mon,12),ro=runsOnly(),vals=ws.map(function(w){return sumRange(C.m,w,addDays(w,6))}),rv=ws.map(function(w){return sumBy(ro,w,addDays(w,6))});
   var W=340,H=180,L=26,B=22,T=12,max=Math.max(S.weekly*1.2,Math.max.apply(null,vals)*1.08);
   var bw=(W-L)/12,y=function(v){return T+(H-T-B)*(1-v/max)};
   var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Weekly kilometres for the last 12 weeks">';
   var stepV=max>60?20:10;
   for(var v=0;v<=max;v+=stepV)s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--grid)"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+v+'</text>';
   vals.forEach(function(v,i){
-    var x=L+i*bw+bw*0.16,w=bw*0.68,yy=y(v),h=Math.max(0,H-B-yy),cur=i===11,r=Math.min(4,w/2,h);
-    if(h>0)s+='<path d="M'+x+','+(H-B)+'V'+(yy+r)+'q0,-'+r+' '+r+',-'+r+'H'+(x+w-r)+'q'+r+',0 '+r+','+r+'V'+(H-B)+'Z" fill="var(--red)" opacity="'+(cur?0.45:(v>=S.weekly?1:0.78))+'"/>';
+    /* stacked: run on the baseline, walk on top with a 2px gap; only the top segment gets rounded corners */
+    var x=L+i*bw+bw*0.16,w=bw*0.68,cur=i===11,base=H-B,yr=y(rv[i]),yt=y(v),walk=v-rv[i]>0.005;
+    function bar(top,bot,fill,round){var h=bot-top;if(h<=0)return '';var r=round?Math.min(4,w/2,h):0;
+      return '<path d="M'+x+','+bot+'V'+(top+r)+'q0,-'+r+' '+r+',-'+r+'H'+(x+w-r)+'q'+r+',0 '+r+','+r+'V'+bot+'Z" fill="'+fill+'"/>'}
+    s+=bar(yr,base,'var(--red)',!walk);
+    if(walk)s+=bar(yt,Math.min(base,yr-(rv[i]>0?2:0)),'var(--walk)',true);
     s+='<rect class="hit" data-i="'+i+'" x="'+(L+i*bw)+'" y="'+T+'" width="'+bw+'" height="'+(H-T-B)+'" fill="transparent"/>';
     if(i%3===2||cur)s+='<text x="'+(L+i*bw+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+(cur?'Now':short(ws[i]))+'</text>';
   });
   s+='<line x1="'+L+'" x2="'+W+'" y1="'+y(S.weekly)+'" y2="'+y(S.weekly)+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 4"/>';
   s+='<text class="halo" x="'+(L+4)+'" y="'+(y(S.weekly)-6)+'" style="fill:var(--ink);font-weight:700">Target '+S.weekly+'</text></svg><div class="tip"></div>';
   var el=$('weeklyChart');el.innerHTML=s;
-  hover(el,function(i){return {x:L+i*bw+bw/2,y:y(vals[i]),html:'<b>'+fmt(vals[i])+' km</b>Week of '+short(ws[i])+(i===11?' (so far)':vals[i]>=S.weekly?', target hit':'')}},W);
+  hover(el,function(i){return {x:L+i*bw+bw/2,y:y(vals[i]),html:'<b>'+fmt(vals[i])+' km</b>'+(vals[i]-rv[i]>0.005?fmt(rv[i])+' run, '+fmt(vals[i]-rv[i])+' walk<br>':'')+'Week of '+short(ws[i])+(i===11?' (so far)':vals[i]>=S.weekly?', target hit':'')}},W);
 }
 
 function avgChart(C){
@@ -409,17 +439,18 @@ function hover(el,get,W){
 /* ---------- RECORDS tab ---------- */
 var weeksShown=2;
 function renderRecords(C){
-  var m=C.m,longest=S.runs.reduce(function(a,r){return r.km>a.km?r:a},{km:0}),wk={},mo={};
+  var m=C.m,longest=runsOnly().reduce(function(a,r){return r.km>a.km?r:a},{km:0}),longWalk=S.runs.filter(isWalk).reduce(function(a,r){return r.km>a.km?r:a},{km:0}),wk={},mo={};
   Object.keys(m).forEach(function(k){var w=key(monday(parse(k)));wk[w]=(wk[w]||0)+m[k];mo[k.slice(0,7)]=(mo[k.slice(0,7)]||0)+m[k]});
   function top(o){var b=null;Object.keys(o).forEach(function(k){if(!b||o[k]>o[b])b=k});return b}
   var bw=top(wk),bm=top(mo),total=S.runs.reduce(function(a,r){return a+r.km},0);
-  var nr=S.runs.length+' run'+(S.runs.length===1?'':'s');$('recSub').textContent=nr;
+  var nr=tally(S.runs);$('recSub').textContent=nr;
   var h='<div class="best hl"><div class="n">'+fmt(total,0)+' km</div><div class="l">All-time total across '+nr+'</div></div>';
   if(longest.km)h+='<div class="best"><div class="n">'+fmt(longest.km,2)+'</div><div class="l">Longest run (km), '+short(parse(longest.date))+'</div></div>';
+  if(longWalk.km)h+='<div class="best"><div class="n">'+fmt(longWalk.km,2)+'</div><div class="l">Longest walk (km), '+short(parse(longWalk.date))+'</div></div>';
   if(bw)h+='<div class="best"><div class="n">'+fmt(wk[bw])+'</div><div class="l">Best week (km), '+short(parse(bw))+'</div></div>';
   if(bm)h+='<div class="best"><div class="n">'+fmt(mo[bm],0)+'</div><div class="l">Best month (km), '+MON[+bm.slice(5)-1]+'</div></div>';
   h+='<div class="best"><div class="n">'+C.bestStreak+'</div><div class="l">Longest weekday streak</div></div>';
-  $('bests').innerHTML=S.runs.length?h:'<p class="meh" style="grid-column:span 2;margin:0">Your longest run, best week, best month and longest streak appear here once you start logging.</p>';
+  $('bests').innerHTML=S.runs.length?h:'<p class="meh" style="grid-column:span 2;margin:0">Your longest run and walk, best week, best month and longest streak appear here once you start logging.</p>';
 
   /* history grouped by week, newest first */
   var groups={};S.runs.forEach(function(r){var w=key(monday(parse(r.date)));(groups[w]=groups[w]||[]).push(r)});
@@ -427,10 +458,10 @@ function renderRecords(C){
   ks.slice(0,weeksShown).forEach(function(w){
     var rs=groups[w].sort(function(a,b){return a.date<b.date?1:-1}),t=rs.reduce(function(a,r){return a+r.km},0),cur=w===key(C.mon);
     out+='<div class="wk"><div class="wkhead"><span class="t">'+(cur?'This week':'Week of '+short(parse(w)))+'</span><span class="s'+(t>=S.weekly?' hit':'')+'">'+fmt(t)+' / '+S.weekly+' km</span></div>';
-    rs.forEach(function(r){var d=parse(r.date);out+='<div class="run"><span class="d">'+WD[d.getDay()]+' '+short(d)+'</span><span><span class="k">'+fmt(r.km,2)+' km</span><button class="x" data-date="'+r.date+'" data-km="'+r.km+'" aria-label="Delete run">&times;</button></span></div>'});
+    rs.forEach(function(r){var d=parse(r.date);out+='<div class="run"><span class="d">'+WD[d.getDay()]+' '+short(d)+'<span class="tag">'+(isWalk(r)?'Walk':'Run')+'</span></span><span><span class="k">'+fmt(r.km,2)+' km</span><button class="x" data-date="'+r.date+'" data-km="'+r.km+'" data-type="'+(isWalk(r)?'walk':'run')+'" aria-label="Delete entry">&times;</button></span></div>'});
     out+='</div>';
   });
-  $('history').innerHTML=out||'<p class="meh">No runs yet. Tap + to add one.</p>';
+  $('history').innerHTML=out||'<p class="meh">Nothing logged yet. Tap + to add a run or walk.</p>';
   $('showMore').hidden=ks.length<=weeksShown;
 }
 
@@ -443,16 +474,20 @@ function setTab(t){
 }
 document.querySelectorAll('.tb[data-tab]').forEach(function(b){b.onclick=function(){setTab(b.dataset.tab)}});
 
-$('history').addEventListener('click',function(e){var b=e.target.closest('.x');if(!b||!confirm('Delete this run?'))return;
-  var i=S.runs.findIndex(function(r){return r.date===b.dataset.date&&r.km===+b.dataset.km});if(i>-1){S.runs.splice(i,1);save();render()}});
+$('history').addEventListener('click',function(e){var b=e.target.closest('.x');if(!b||!confirm('Delete this '+b.dataset.type+'?'))return;
+  var i=S.runs.findIndex(function(r){return r.date===b.dataset.date&&r.km===+b.dataset.km&&(isWalk(r)?'walk':'run')===b.dataset.type});if(i>-1){S.runs.splice(i,1);save();render()}});
 $('showMore').onclick=function(){weeksShown+=8;renderRecords(compute())};
 
 function open(id){document.body.classList.add('open');$(id).classList.add('show')}
 function close(){document.body.classList.remove('open');document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('show')})}
 $('scrim').onclick=close;
-$('openAdd').onclick=function(){$('inDate').value=key(new Date());$('inKm').value='';open('addSheet');setTimeout(function(){$('inKm').focus()},280)};
+var addType='run';
+function setType(t){addType=t;document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('on',b.dataset.type===t)});$('saveRun').textContent=t==='walk'?'Save walk':'Save run'}
+document.querySelectorAll('.seg button').forEach(function(b){b.onclick=function(){setType(b.dataset.type)}});
+$('openAdd').onclick=function(){setType('run');$('inDate').value=key(new Date());$('inKm').value='';open('addSheet');setTimeout(function(){$('inKm').focus()},280)};
 $('saveRun').onclick=function(){var km=parseFloat($('inKm').value),dt=$('inDate').value;if(!(km>0)||!dt)return;
-  S.runs.push({date:dt,km:+km.toFixed(2),src:'manual'});save();close();setTab('week');render()};
+  var e={date:dt,km:+km.toFixed(2),src:'manual'};if(addType==='walk')e.type='walk';
+  S.runs.push(e);save();close();setTab('week');render()};
 $('tabSettings').onclick=function(){$('inWeek').value=S.weekly;$('inYear').value=S.yearly;open('setSheet')};
 $('saveSet').onclick=function(){var w=parseFloat($('inWeek').value),y=parseFloat($('inYear').value);if(w>0)S.weekly=w;if(y>0)S.yearly=y;save();close();render()};
 $('exportBtn').onclick=function(){var blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');
