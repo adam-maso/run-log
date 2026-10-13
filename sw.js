@@ -1,5 +1,5 @@
 /* Run Log service worker: works offline at the gym. Network first, so updates show whenever you're online. */
-const CACHE = 'runlog-v3';
+const CACHE = 'runlog-v4';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'manifest.json', 'apple-touch-icon.png', 'icon-192.png'])).catch(() => {}));
   self.skipWaiting();
