@@ -161,6 +161,85 @@ body.open .scrim{opacity:1;pointer-events:auto}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .primary{width:100%;background:var(--red);color:#fff;font-weight:800;font-size:16px;padding:15px;border-radius:16px}
 .secondary{width:100%;background:var(--bg);font-weight:700;padding:13px;border-radius:14px;margin-top:8px}
+
+/* ---------- STRENGTH ---------- */
+.gear{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-right:-8px}
+.gear svg{width:22px;height:22px;stroke:#fff}
+.day{position:relative}
+.day .sdot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--ink2)}
+.sb-today{background:var(--hero);color:#fff;border-radius:22px;padding:18px;margin-top:8px}
+.sb-today .k{font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;opacity:.85}
+.sb-today .t{font-size:24px;font-weight:800;letter-spacing:-.6px;line-height:1.15;margin-top:4px}
+.sb-today p{margin:6px 0 0;font-size:14.5px;opacity:.95}
+.sb-go{width:100%;margin-top:14px;background:#fff;color:var(--red-deep);font-weight:800;font-size:16px;padding:14px;border-radius:14px}
+@media (prefers-color-scheme: dark){.sb-go{color:#8E0E16}}
+.sb-row{width:100%;display:flex;align-items:center;gap:14px;text-align:left;background:var(--surface);border-radius:16px;padding:12px 14px;margin-bottom:8px}
+.sb-row .L{font-size:28px;font-weight:800;color:var(--red);width:26px;text-align:center;flex:none}
+.sb-row .x{flex:1;min-width:0}
+.sb-row .x b{display:block;font-size:15.5px}
+.sb-row .x span{font-size:13px;color:var(--muted)}
+.sb-row .chev{color:var(--muted);font-size:22px}
+.sb-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.sb-cell{aspect-ratio:1;border-radius:9px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted)}
+.sb-cell.done{background:var(--red);color:#fff}
+.sb-cell.today{outline:2.5px solid var(--red);outline-offset:1px}
+.sb-cell.future{opacity:.5}
+.sb-measure{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center}
+.sb-measure .h{font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.sb-measure input{width:100%;min-width:0;font:inherit;font-weight:700;padding:10px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.sb-ov{position:fixed;inset:0;z-index:30;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(10px + env(safe-area-inset-top)) 0 calc(110px + env(safe-area-inset-bottom))}
+.sb-back{color:var(--red);font-weight:700;padding:8px 0}
+.sb-eyebrow{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.sb-h1{margin:4px 0 0;font-size:32px;letter-spacing:-1px;line-height:1.1}
+.sb-fmt{color:var(--ink2);margin:6px 0 16px}
+.sb-opts{background:var(--surface);border-radius:18px;padding:4px 16px}
+.sb-opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.sb-opt:last-child{border-bottom:0}
+.sb-opt small{display:block;font-size:12.5px;color:var(--muted)}
+.sb-rseg{display:flex;background:var(--bg);border-radius:11px;padding:3px}
+.sb-rseg button{padding:7px 14px;border-radius:9px;font-weight:700;color:var(--ink2)}
+.sb-rseg button.on{background:var(--red);color:#fff}
+.sb-sw{width:50px;height:30px;border-radius:15px;background:var(--line);position:relative;flex:none}
+.sb-sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.sb-sw[aria-checked="true"]{background:var(--red)}
+.sb-sw[aria-checked="true"]::after{transform:translateX(20px)}
+details.sb-ex{background:var(--surface);border-radius:16px;margin-bottom:8px}
+details.sb-ex summary{list-style:none;padding:14px 16px;display:flex;gap:12px;align-items:baseline;cursor:pointer}
+details.sb-ex summary::-webkit-details-marker{display:none}
+details.sb-ex summary .i{color:var(--muted);font-weight:700;width:18px;flex:none}
+details.sb-ex summary .n{flex:1;font-weight:700}
+details.sb-ex summary .c{color:var(--muted);font-size:20px;transition:transform .15s}
+details.sb-ex[open] summary .c{transform:rotate(90deg)}
+.sb-exb{padding:0 16px 16px 46px;font-size:14.5px}
+.sb-exb dl{margin:0;display:flex;flex-direction:column;gap:10px}
+.sb-exb dt{font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.sb-exb dd{margin:2px 0 0}
+.sb-cta{position:fixed;left:0;right:0;bottom:0;z-index:31;padding:12px 0 calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.sb-run{position:fixed;inset:0;z-index:40;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom))}
+.sb-runin{height:100%;display:flex;flex-direction:column;gap:12px}
+.sb-runhead{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--muted)}
+.sb-bar{height:4px;border-radius:2px;background:var(--grid);overflow:hidden}
+.sb-bar i{display:block;height:100%;width:0;background:var(--ink)}
+.sb-phase{text-align:center;font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--red)}
+.sb-ring{position:relative;width:min(70vw,40vh,320px);aspect-ratio:1;margin:0 auto;flex:none}
+.sb-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.sb-ring circle{fill:none;stroke-width:9}
+.sb-ring .bg{stroke:var(--grid)}
+.sb-ring .fg{stroke:var(--red);stroke-linecap:round}
+.sb-count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(26vw,15vh,120px);font-weight:800;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+.sb-now{flex:1;min-height:0;overflow-y:auto;text-align:center}
+.sb-name{font-size:28px;font-weight:800;letter-spacing:-.6px;line-height:1.1}
+.sb-cue{margin:8px auto 0;max-width:34ch;color:var(--ink2)}
+.sb-next{margin:8px 0 0;color:var(--muted);font-size:14px}
+.sb-ctrl{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:10px}
+.sb-ctrl button{background:var(--surface);border-radius:14px;padding:15px 6px;font-weight:700}
+.sb-ctrl .main{background:var(--ink);color:var(--bg);font-weight:800;font-size:17px}
+.sb-run[data-kind="rest"] .sb-phase{color:var(--warn)}
+.sb-run[data-kind="rest"] .fg{stroke:var(--warn)}
+.sb-run[data-kind="warm"] .sb-phase,.sb-run[data-kind="cool"] .sb-phase{color:var(--ink2)}
+.sb-run[data-kind="warm"] .fg,.sb-run[data-kind="cool"] .fg{stroke:var(--ink2)}
+@media (prefers-reduced-motion: reduce){.tab{animation:none}.sb-sw::after{transition:none}}
 </style>
 </head>
 <body>
@@ -169,7 +248,8 @@ body.open .scrim{opacity:1;pointer-events:auto}
 <section class="tab on" id="t-week">
   <div class="hero">
     <div class="wrap">
-      <div class="topbar"><div class="brand">Adam&rsquo;s Running Tracker<span id="todayLbl"></span></div></div>
+      <div class="topbar"><div class="brand">Adam&rsquo;s Running Tracker<span id="todayLbl"></span></div>
+        <button class="gear" id="tabSettings" aria-label="Goals and backup"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
       <div class="ringwrap">
         <svg viewBox="0 0 230 230"><circle class="ring-track" cx="115" cy="115" r="96"/><circle class="ring-walk" id="ringWalk" cx="115" cy="115" r="96"/><circle class="ring-fill" id="ring" cx="115" cy="115" r="96"/></svg>
         <div class="ringtext"><div class="n" id="wkKm">0</div><div class="of" id="wkOf"></div><div class="split" id="wkSplit" hidden></div></div>
@@ -211,19 +291,64 @@ body.open .scrim{opacity:1;pointer-events:auto}
   <button class="more" id="showMore" hidden>Show earlier weeks</button>
 </div></section>
 
+<!-- STRENGTH -->
+<section class="tab" id="t-strength"><div class="wrap">
+  <div class="pagehead"><h1>Strength</h1><span class="s" id="sbSub"></span></div>
+  <div class="sb-today" id="sbToday"></div>
+  <h2>Sessions <span id="sbRoundsNote"></span></h2>
+  <div id="sbList"></div>
+  <h2>28-day block <span>19 Oct to 15 Nov</span></h2>
+  <div class="sb-grid" id="sbGrid" aria-label="Strength sessions done in the 28-day block"></div>
+  <h2>Check-in <span>day 1 and day 28</span></h2>
+  <div class="sb-measure">
+    <span></span><span class="h">Waist (cm)</span><span class="h">Push-ups</span>
+    <span class="h">Day 1</span><input id="sbW1" inputmode="decimal" aria-label="Day 1 waist in cm"><input id="sbP1" inputmode="numeric" aria-label="Day 1 push-ups">
+    <span class="h">Day 28</span><input id="sbW28" inputmode="decimal" aria-label="Day 28 waist in cm"><input id="sbP28" inputmode="numeric" aria-label="Day 28 push-ups">
+  </div>
+</div></section>
+
 <nav class="tabbar"><div class="in">
   <button class="tb on" data-tab="week"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Week</button>
-  <button class="tb" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress</button>
+  <button class="tb" data-tab="strength"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></svg>Strength</button>
   <button class="add" id="openAdd" aria-label="Add a run or walk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="tb" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress</button>
   <button class="tb" data-tab="records"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Records</button>
-  <button class="tb" id="tabSettings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Settings</button>
 </div></nav>
+
+<!-- STRENGTH: session brief -->
+<section class="sb-ov" id="sbBrief" hidden><div class="wrap">
+  <button class="sb-back" id="sbBack">&lsaquo; Strength</button>
+  <div class="sb-eyebrow" id="sbBTag"></div>
+  <h1 class="sb-h1" id="sbBTitle"></h1>
+  <p class="sb-fmt" id="sbBFmt"></p>
+  <div class="sb-opts">
+    <div class="sb-opt" id="sbRoundsRow"><span>Rounds</span><div class="sb-rseg" id="sbRseg"></div></div>
+    <div class="sb-opt" id="sbWarmRow"><span>2-minute warm-up<small>Not needed straight after a run</small></span><button class="sb-sw" id="sbWarm" role="switch" aria-label="Warm-up"></button></div>
+    <div class="sb-opt"><span>Short version<small>1 round only, for flat days</small></span><button class="sb-sw" id="sbShort" role="switch" aria-label="Short version"></button></div>
+    <div class="sb-opt"><span>Voice cues<small>Turn the ringer on</small></span><button class="sb-sw" id="sbVoice" role="switch" aria-label="Voice cues"></button></div>
+  </div>
+  <h2>Exercises <span>tap for how-to</span></h2>
+  <div id="sbEx"></div>
+  <div id="sbCoolWrap"><h2>Post-run stretch <span>1 minute each</span></h2><div id="sbCool"></div></div>
+</div>
+<div class="sb-cta"><div class="wrap"><button class="primary" id="sbStart">Start</button></div></div>
+</section>
+
+<!-- STRENGTH: timer -->
+<section class="sb-run" id="sbRun" hidden aria-live="polite"><div class="wrap sb-runin">
+  <div class="sb-runhead"><button class="sb-back" id="sbQuit">&times; End</button><span id="sbRound"></span></div>
+  <div class="sb-bar" aria-hidden="true"><i id="sbBar"></i></div>
+  <div class="sb-phase" id="sbPhase"></div>
+  <div class="sb-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="sbRingFg" cx="60" cy="60" r="52"/></svg><div class="sb-count" id="sbCount"></div></div>
+  <div class="sb-now"><div class="sb-name" id="sbName"></div><p class="sb-cue" id="sbCue"></p><p class="sb-next" id="sbNext"></p></div>
+  <div class="sb-ctrl"><button id="sbPrev">Back</button><button class="main" id="sbPause">Pause</button><button id="sbSkip">Skip</button></div>
+</div></section>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="addSheet" role="dialog" aria-label="Add a run or walk">
   <h3 id="addTitle">Add activity</h3>
   <div class="seg" role="group" aria-label="Activity type"><button type="button" data-type="run" class="on">Run</button><button type="button" data-type="walk">Walk</button></div>
-  <div class="field bigkm"><input id="inKm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.0" aria-label="Distance in km"></div>
+  <div class="field bigkm"><input id="inKm" type="number" inputmode="decimal" step="any" min="0" placeholder="0" aria-label="Distance in km"></div>
   <div class="field"><label for="inDate">Date</label><input id="inDate" type="date"></div>
   <button class="primary" id="saveRun">Save run</button>
   <button class="danger" id="delEntry" hidden>Delete</button>
@@ -237,6 +362,12 @@ body.open .scrim{opacity:1;pointer-events:auto}
   <p class="hint">Monthly target is your yearly target spread evenly across the year.</p>
   <button class="primary" id="saveSet">Save goals</button>
   <button class="secondary" id="exportBtn">Export backup</button>
+</div>
+<div class="sheet" id="postSheet" role="dialog" aria-label="Post-run session">
+  <h3>Run saved</h3>
+  <p class="hint" style="margin:0 0 16px;font-size:15px" id="postTxt"></p>
+  <button class="primary" id="postGo">Start post-run session</button>
+  <button class="secondary" id="postLater">Later</button>
 </div>
 
 <script>
@@ -332,7 +463,7 @@ function renderWeek(C){
     var dd=addDays(C.mon,i),k=key(dd),c='day';
     if(m[k])c+=runDays[k]?' done':' walkday';else if(dd>C.today)c+=' future';
     if(k===tk)c+=' today';
-    h+='<div class="'+c+'"><div class="l">'+l+'</div><div class="v">'+(m[k]?fmt(m[k]):'<span class="tick"></span>')+'</div></div>';
+    h+='<div class="'+c+'">'+(ST.log[k]?'<i class="sdot" title="Strength session done"></i>':'')+'<div class="l">'+l+'</div><div class="v">'+(m[k]?fmt(m[k]):'<span class="tick"></span>')+'</div></div>';
   });
   $('wkDays').innerHTML=h;
   $('stStreak').innerHTML=C.streak+'<small>days</small>';
@@ -469,12 +600,221 @@ function renderRecords(C){
   $('showMore').hidden=ks.length<=weeksShown;
 }
 
+/* ---------- STRENGTH tab: post-run bodyweight routine (folded in from Morning Drill, Oct 2026) ----------
+   Run days: Session A straight after the run, no warm-up, then a 3-minute stretch.
+   Non-run days: B or C alternating, with a 2-minute warm-up. M (mobility) whenever.
+   Sessions are stored in S.strength, so they ride along in the backup export. */
+var SB_START=new Date(2026,9,19),SB_LEN=28;
+if(!S.strength){S.strength={log:{},measure:{},voice:true};save()}
+var ST=S.strength;
+var EX={
+  pushup:{n:"Push-ups",cue:"Straight line head to heels. Chest to a fist off the floor.",
+    how:"Hands just wider than your shoulders, body straight from head to heels. Lower until your chest is about a fist's height off the floor, then push the floor away.",
+    tips:"Squeeze your glutes and brace your stomach so your hips don't sag. Elbows angle back at about 45 degrees, not flared straight out.",
+    easier:"Drop to your knees, or put your hands on a bench or step.",harder:"Take three seconds on the way down."},
+  pike:{n:"Pike push-ups",cue:"Hips high. Top of the head towards the floor.",
+    how:"Start in an upside-down V: hands shoulder width, hips high, legs as straight as is comfortable. Bend your elbows to bring the top of your head towards the floor just in front of your hands, then press back up.",
+    tips:"This works the shoulders. Keep the hips high the whole time; if they drop, it turns into a normal push-up.",
+    easier:"Walk your feet further back so the angle is less steep.",harder:"Put your feet up on a step."},
+  taps:{n:"Plank shoulder taps",cue:"Hips still. Tap the opposite shoulder, alternate.",
+    how:"High plank on straight arms. Lift one hand and tap the opposite shoulder, put it down, then switch. Keep going for the full interval.",
+    tips:"The goal is zero hip rock. Spread your feet wider if you're twisting.",
+    easier:"Feet wider, or do it from your knees.",harder:"Feet together and slow each tap down."},
+  deadbug:{n:"Dead bugs",cue:"Lower back flat. Opposite arm and leg, slowly.",
+    how:"Lie on your back, arms pointing at the ceiling, knees bent at 90 degrees above your hips. Press your lower back into the floor. Slowly lower the right arm and left leg towards the floor, return, then swap sides.",
+    tips:"Breathe out as you lower. If your lower back lifts off the floor, don't lower as far.",
+    easier:"Move only the legs and keep the arms up.",harder:"Hold two seconds at full stretch."},
+  squat:{n:"Squats",cue:"Hips back and down. Slow on the way down.",
+    how:"Feet shoulder width, toes slightly out. Sit your hips back and down until your thighs are about parallel to the floor, heels staying down, then stand up tall.",
+    tips:"Take three seconds on the way down. Knees track over your toes; chest stays up.",
+    easier:"Squat down to touch a chair, then stand.",harder:"Pause for two seconds at the bottom."},
+  lunge:{n:"Reverse lunges",cue:"Step back, back knee towards the floor. Alternate.",
+    how:"Stand tall, step one foot back and lower your back knee towards the floor. Front knee stays over the ankle. Push through the front heel to return, then switch legs.",
+    tips:"Most of your weight stays on the front leg. Keep your torso upright.",
+    easier:"Hold a wall or bench for balance and go less deep.",harder:"Slow the lowering to three seconds."},
+  bridge:{n:"Glute bridges",cue:"Drive through the heels. Squeeze at the top.",
+    how:"Lie on your back, knees bent, feet flat and hip width apart. Push through your heels and lift your hips until there's a straight line from knees to shoulders. Squeeze for a second, then lower.",
+    tips:"Squeeze the glutes rather than arching your lower back to get height.",
+    easier:"Shorter range and no pause.",harder:"Single leg, swapping legs halfway."},
+  sideplank:{n:"Side plank",cue:"20 seconds each side. Hips up, straight line.",split:1,
+    how:"On one forearm with the elbow under your shoulder, feet stacked. Lift your hips so your body forms a straight line from head to feet. Hold, then switch sides when the voice says so.",
+    tips:"Don't let the hips sag or drift backwards. Push the floor away with your forearm.",
+    easier:"Bottom knee on the floor.",harder:"Lift the top leg."},
+  burpee:{n:"Burpees",cue:"Steady pace, not flat out.",
+    how:"Squat down, hands on the floor, jump or step your feet back to a plank. Jump or step them back in, stand up and jump with your arms overhead.",
+    tips:"Pick a pace you can hold for the full 40 seconds. Add a push-up at the bottom once it gets easy.",
+    easier:"Step back and in, and skip the jump at the top.",harder:"Add the push-up."},
+  climber:{n:"Mountain climbers",cue:"High plank. Drive the knees, hips level.",
+    how:"High plank on straight arms. Drive one knee towards your chest, then switch legs quickly, like running in place.",
+    tips:"Shoulders stay over the hands and hips stay level with your shoulders, not up in the air.",
+    easier:"Slow it to a controlled step.",harder:"Faster, or knee across to the opposite elbow."},
+  jumpsquat:{n:"Jump squats",cue:"Squat, jump, land soft.",
+    how:"Drop into a squat, then jump straight up. Land softly through the midfoot and bend your knees to absorb it, going straight into the next squat.",
+    tips:"Quiet landings. If your calves or knees are sore from running, do regular squats instead.",
+    easier:"Normal squat, rising onto your toes at the top.",harder:"Pause at the bottom before each jump."},
+  hollow:{n:"Hollow hold",cue:"Lower back pressed down. Arms and legs just off the floor.",
+    how:"Lie on your back, press your lower back into the floor, then lift your shoulders and legs a few centimetres off the ground. Arms by your sides or overhead. Hold.",
+    tips:"If your lower back lifts, raise your legs higher or bend your knees. Rest briefly and go again if needed.",
+    easier:"Knees bent, arms by your sides.",harder:"Arms overhead and legs lower."},
+  catcow:{n:"Cat-cow",cue:"Round the back, then arch. Slow, with the breath.",
+    how:"On hands and knees. Breathe out and round your back towards the ceiling, tucking your chin. Breathe in and let your stomach drop as you lift your chest and tailbone.",
+    tips:"Move slowly, one section of the spine at a time.",easier:"Smaller range.",harder:"Hold each end for a breath."},
+  wgs:{n:"World's greatest stretch",cue:"Lunge, elbow to instep, rotate. Alternate sides.",
+    how:"Step into a long lunge, both hands down inside the front foot. Drop the inside elbow towards the instep, then rotate that arm up to the ceiling. Return and switch sides.",
+    tips:"Keep the back leg straight and strong.",easier:"Back knee on the floor.",harder:"Hold the rotation for a breath."},
+  hipflex:{n:"Hip flexor stretch",cue:"Half kneel, tuck the hips, lean forward. Switch halfway.",split:1,
+    how:"Half kneeling, one knee down and the other foot in front. Tuck your tailbone under and gently shift forward until you feel a stretch at the front of the back hip. Switch sides when the voice says so.",
+    tips:"A big one for runners. The tuck matters more than how far forward you go.",easier:"Pad under the knee.",harder:"Reach the same-side arm overhead."},
+  tspine:{n:"Thread the needle",cue:"On all fours, reach under, then open to the ceiling.",
+    how:"On hands and knees. Slide one arm under your body along the floor, then sweep it up towards the ceiling, following it with your eyes. Alternate sides.",
+    tips:"Hips stay over the knees; the twist comes from the upper back.",easier:"Smaller range.",harder:"Pause at each end."},
+  deepsquat:{n:"Deep squat hold",cue:"Sit low, heels down, elbows pushing the knees out.",
+    how:"Lower into the deepest squat you can with heels down. Hands together, elbows pushing gently against the inside of the knees. Hold and breathe.",
+    tips:"Hold onto a door frame if you tip backwards.",easier:"Heels on a folded towel.",harder:"Shift slowly side to side."},
+  calf:{n:"Calf stretch",cue:"Hands on a wall, back heel down. Switch halfway.",split:1,
+    how:"Hands on a wall, one foot back with the leg straight and the heel down. Lean in until you feel the stretch in the calf. Switch sides when the voice says so.",
+    tips:"Point the back toes straight ahead.",easier:"Shorter stance.",harder:"Bend the back knee slightly for the lower calf."},
+  figure4:{n:"Figure-4 glute stretch",cue:"On your back, ankle over the opposite knee, pull the thigh in. Switch halfway.",split:1,
+    how:"Lie on your back with knees bent. Cross one ankle over the opposite knee, then lift that foot off the floor and pull the thigh towards your chest until you feel it in the glute of the crossed leg. Switch sides when the voice says so.",
+    tips:"Keep your head and shoulders relaxed on the floor.",easier:"Leave the bottom foot on the floor.",harder:"Pull the thigh in closer."}
+};
+var SESS={
+  A:{name:'Upper and core',ex:['pushup','pike','taps','deadbug'],work:40,rest:20},
+  B:{name:'Legs and core',ex:['squat','lunge','bridge','sideplank'],work:40,rest:20},
+  C:{name:'Conditioning',ex:['burpee','climber','jumpsquat','hollow'],work:40,rest:20},
+  M:{name:'Mobility',ex:['catcow','wgs','hipflex','tspine','deepsquat','calf'],work:45,rest:15,fixed:1,noWarm:1}
+};
+var COOL=['hipflex','calf','figure4'];
+function sbDayN(){return Math.round((todayD()-SB_START)/DAY)+1}
+function sbWeek(){var d=sbDayN();return d<1?1:Math.ceil(Math.min(d,SB_LEN)/7)}
+/* Post-run A is a round lighter than a standalone session; everything goes up a round from week 3 */
+function sbRounds(post){var late=sbWeek()>2;return post?(late?4:3):(late?5:4)}
+function ranOn(k){return runsOnly().some(function(r){return r.date===k})}
+function nextBC(){var ks=Object.keys(ST.log).sort();for(var i=ks.length-1;i>=0;i--){var v=ST.log[ks[i]];if(v==='B'||v==='C')return v==='B'?'C':'B'}return 'B'}
+function sbCfg(k,post){var s=SESS[k];return {key:k,post:!!post,rounds:sbRounds(post),short:false,warm:!post&&!s.noWarm}}
+function sbSecs(c){var s=SESS[c.key],r=c.short?1:(s.fixed||c.rounds);return (c.warm&&!c.short?120:0)+r*s.ex.length*(s.work+s.rest)-s.rest+(c.post?COOL.length*60:0)}
+function sbMins(c){return Math.round(sbSecs(c)/60)}
+
+function renderStrength(C){
+  var d=sbDayN(),tk=key(C.today),done=ST.log[tk],h,c;
+  $('sbSub').textContent=d<1?'Starts 19 Oct':d>SB_LEN?'Block complete':'Day '+d+' of '+SB_LEN;
+  if(done){h='<div class="k">Done today</div><div class="t">Session '+done+': '+SESS[done].name.toLowerCase()+'</div><p>Logged. Pick a session below if you want to go again.</p>'}
+  else if(ranOn(tk)){c=sbCfg('A',true);
+    h='<div class="k">After today&rsquo;s run</div><div class="t">Session A: upper and core</div><p>'+c.rounds+' rounds, then a 3-minute stretch. About '+sbMins(c)+' minutes, no warm-up needed.</p><button class="sb-go" data-k="A" data-post="1">Start post-run session</button>'}
+  else{var n=nextBC();c=sbCfg(n,false);
+    h='<div class="k">No run logged today</div><div class="t">Session '+n+': '+SESS[n].name.toLowerCase()+'</div><p>'+c.rounds+' rounds with a warm-up, about '+sbMins(c)+' minutes. Running today? Log the run and Session A comes up straight after.</p><button class="sb-go" data-k="'+n+'">Start Session '+n+'</button>'}
+  $('sbToday').innerHTML=h;
+  $('sbRoundsNote').textContent=sbWeek()>2?'weeks 3 and 4: one more round':'weeks 1 and 2';
+  var post=ranOn(tk),rows='';
+  [['A',post?'After today’s run':'Straight after a run'],['B','Non-run days'],['C','Non-run days'],['M','Once a week, or when stiff']].forEach(function(r){
+    var cf=sbCfg(r[0],r[0]==='A'&&post);
+    rows+='<button class="sb-row" data-k="'+r[0]+'"'+(cf.post?' data-post="1"':'')+'><span class="L">'+r[0]+'</span><span class="x"><b>'+SESS[r[0]].name+'</b><span>'+r[1]+' &middot; about '+sbMins(cf)+' min</span></span><span class="chev">&rsaquo;</span></button>'});
+  $('sbList').innerHTML=rows;
+  var g='';for(var i=0;i<SB_LEN;i++){var dd=addDays(SB_START,i),k=key(dd);
+    g+='<div class="sb-cell'+(ST.log[k]?' done':'')+(k===tk?' today':'')+(dd>C.today?' future':'')+'" title="'+short(dd)+'">'+(ST.log[k]||(i+1))+'</div>'}
+  $('sbGrid').innerHTML=g;
+}
+function sbOpenFrom(e){var b=e.target.closest('[data-k]');if(b)openBrief(b.dataset.k,!!b.dataset.post)}
+$('sbToday').addEventListener('click',sbOpenFrom);
+$('sbList').addEventListener('click',sbOpenFrom);
+[['sbW1','w1'],['sbP1','p1'],['sbW28','w28'],['sbP28','p28']].forEach(function(p){var el=$(p[0]);el.value=ST.measure[p[1]]||'';
+  el.addEventListener('input',function(){ST.measure[p[1]]=el.value;save()})});
+
+/* session brief */
+var cur=sbCfg('A',false);
+function sw(el,on){el.setAttribute('aria-checked',on?'true':'false')}
+function exHtml(ids){return ids.map(function(id,i){var e=EX[id];
+  return '<details class="sb-ex"><summary><span class="i">'+(i+1)+'</span><span class="n">'+e.n+'</span><span class="c" aria-hidden="true">&rsaquo;</span></summary><div class="sb-exb"><dl>'+
+    '<div><dt>How</dt><dd>'+e.how+'</dd></div><div><dt>Form</dt><dd>'+e.tips+'</dd></div><div><dt>Easier</dt><dd>'+e.easier+'</dd></div><div><dt>Harder</dt><dd>'+e.harder+'</dd></div></dl></div></details>'}).join('')}
+function briefText(){var s=SESS[cur.key],r=cur.short?1:(s.fixed||cur.rounds);
+  $('sbBFmt').textContent=(r===1?'One round':r+' rounds')+', '+s.work+' seconds on, '+s.rest+' off'+(cur.warm&&!cur.short?', 2-minute warm-up first':'')+(cur.post?', then a 3-minute stretch':'')+'. About '+sbMins(cur)+' minutes.'}
+function openBrief(k,post){
+  cur=sbCfg(k,post);var s=SESS[k];
+  $('sbBTag').textContent='Session '+k+(post?' · after your run':'');
+  $('sbBTitle').textContent=s.name;
+  $('sbRoundsRow').hidden=!!s.fixed;$('sbWarmRow').hidden=post||!!s.noWarm;
+  var seg=$('sbRseg');seg.innerHTML='';
+  [3,4,5].forEach(function(n){var b=document.createElement('button');b.type='button';b.textContent=n;b.className=n===cur.rounds?'on':'';
+    b.onclick=function(){cur.rounds=n;Array.prototype.forEach.call(seg.children,function(x){x.className=x===b?'on':''});briefText()};seg.appendChild(b)});
+  sw($('sbWarm'),cur.warm);sw($('sbShort'),false);sw($('sbVoice'),ST.voice!==false);
+  $('sbEx').innerHTML=exHtml(s.ex);
+  $('sbCoolWrap').hidden=!post;if(post)$('sbCool').innerHTML=exHtml(COOL);
+  briefText();$('sbBrief').hidden=false;$('sbBrief').scrollTop=0;
+}
+$('sbWarm').onclick=function(){cur.warm=!cur.warm;sw(this,cur.warm);briefText()};
+$('sbShort').onclick=function(){cur.short=!cur.short;sw(this,cur.short);briefText()};
+$('sbVoice').onclick=function(){ST.voice=ST.voice===false;sw(this,ST.voice);save()};
+$('sbBack').onclick=function(){$('sbBrief').hidden=true};
+
+/* audio, voice and keeping the screen awake (all best effort) */
+var actx=null,wake=null;
+function beep(f,len){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime;o.type='sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.4,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+len);o.start(t);o.stop(t+len+0.02)}catch(e){}}
+function say(txt){if(ST.voice===false)return;try{var u=new SpeechSynthesisUtterance(txt);u.lang='en-AU';u.rate=1.05;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function lockScreen(){try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(function(w){wake=w}).catch(function(){})}catch(e){}}
+function unlockScreen(){try{wake&&wake.release()}catch(e){}wake=null}
+
+/* timer */
+var phases=[],idx=0,endAt=0,paused=false,leftAtPause=0,ticker=null,lastSec=-1,logged=false,RC=2*Math.PI*52;
+$('sbRingFg').style.strokeDasharray=RC;
+function build(){var s=SESS[cur.key],r=cur.short?1:(s.fixed||cur.rounds),out=[];
+  if(cur.warm&&!cur.short)out.push({kind:'warm',dur:120});
+  for(var round=1;round<=r;round++)s.ex.forEach(function(id,i){
+    out.push({kind:'work',dur:s.work,ex:id,round:round,rounds:r});
+    if(!(round===r&&i===s.ex.length-1))out.push({kind:'rest',dur:s.rest,round:round,rounds:r,next:s.ex[(i+1)%s.ex.length],newRound:i===s.ex.length-1});
+  });
+  if(cur.post)COOL.forEach(function(id){out.push({kind:'cool',dur:60,ex:id})});
+  return out}
+function nextName(from){for(var i=from+1;i<phases.length;i++)if(phases[i].ex&&phases[i].kind!=='rest')return EX[phases[i].ex].n;return null}
+function logIt(){if(logged)return;logged=true;var tk=key(todayD());ST.log[tk]=cur.key;save()}
+function enter(i){
+  if(i>=phases.length)return finishRun();if(i<0)i=0;
+  idx=i;lastSec=-1;var p=phases[i],nx=nextName(i),e=p.ex?EX[p.ex]:null;
+  if(p.kind==='cool')logIt();
+  endAt=Date.now()+p.dur*1000;leftAtPause=p.dur*1000;
+  $('sbRun').setAttribute('data-kind',p.kind);
+  $('sbRound').textContent=p.round?'Round '+p.round+' of '+p.rounds:(p.kind==='cool'?'Stretch':'');
+  if(p.kind==='warm'){$('sbPhase').textContent='Warm-up';$('sbName').textContent='Loosen up';$('sbCue').textContent='Arm circles, leg swings, a few slow squats, hip circles.';
+    $('sbNext').textContent=nx?'First up: '+nx:'';say('Warm up. Two minutes.')}
+  else if(p.kind==='work'){$('sbPhase').textContent='Work';$('sbName').textContent=e.n;$('sbCue').textContent=e.cue;$('sbNext').textContent=nx?'Next: '+nx:'Last one';
+    beep(880,.35);say(e.n+(e.split?'. Start on your first side.':''))}
+  else if(p.kind==='rest'){var ne=EX[p.next];$('sbPhase').textContent='Rest';$('sbName').textContent='Next: '+ne.n;$('sbCue').textContent=ne.cue;
+    $('sbNext').textContent=p.newRound?'Starting round '+(p.round+1):'';beep(520,.3);say('Rest. Next, '+ne.n)}
+  else{$('sbPhase').textContent='Stretch';$('sbName').textContent=e.n;$('sbCue').textContent=e.cue;$('sbNext').textContent=nx?'Next: '+nx:'Last stretch. Session already logged.';
+    beep(660,.4);say(e.n+'. Start on your first side.')}
+  $('sbBar').style.width=Math.round(i/phases.length*100)+'%';tick();
+}
+function tick(){var p=phases[idx];if(!p)return;
+  var left=paused?leftAtPause:Math.max(0,endAt-Date.now()),sec=Math.ceil(left/1000);
+  $('sbCount').textContent=p.dur>=100?Math.floor(sec/60)+':'+pad(sec%60):sec;
+  $('sbRingFg').style.strokeDashoffset=RC*(1-left/(p.dur*1000));
+  if(!paused&&sec!==lastSec){lastSec=sec;
+    if(sec<=3&&sec>=1)beep(440,.12);
+    if(e2(p)&&sec===Math.round(p.dur/2)){beep(880,.2);say('Switch sides')}}
+  if(!paused&&left<=0)enter(idx+1)}
+function e2(p){return p.ex&&p.kind!=='rest'&&EX[p.ex].split}
+function startRun(){
+  try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();actx.resume&&actx.resume()}catch(e){actx=null}
+  phases=build();paused=false;logged=false;$('sbPause').textContent='Pause';
+  $('sbRun').hidden=false;lockScreen();clearInterval(ticker);ticker=setInterval(tick,200);enter(0)}
+function stopRun(){clearInterval(ticker);ticker=null;unlockScreen();try{speechSynthesis.cancel()}catch(e){}$('sbRun').hidden=true}
+function finishRun(){logIt();stopRun();$('sbBrief').hidden=true;setTab('strength');render();say('Session done. Nice work.')}
+$('sbStart').onclick=startRun;
+$('sbPause').onclick=function(){
+  if(!paused){leftAtPause=Math.max(0,endAt-Date.now());paused=true;this.textContent='Resume';try{speechSynthesis.cancel()}catch(e){}}
+  else{endAt=Date.now()+leftAtPause;paused=false;this.textContent='Pause'}tick()};
+$('sbSkip').onclick=function(){paused=false;$('sbPause').textContent='Pause';enter(idx+1)};
+$('sbPrev').onclick=function(){paused=false;$('sbPause').textContent='Pause';enter(idx-1)};
+/* Ending early only counts once you're into the last exercise or the stretch */
+$('sbQuit').onclick=function(){var p=phases[idx];if(logged||(p&&idx>=phases.length-2-(cur.post?COOL.length:0)))return finishRun();stopRun()};
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&!$('sbRun').hidden)lockScreen()});
+
 /* ---------- wiring ---------- */
-function render(){var C=compute();renderWeek(C);renderProgress(C);renderRecords(C)}
+function render(){var C=compute();renderWeek(C);renderProgress(C);renderRecords(C);renderStrength(C)}
 function setTab(t){
   document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('on',s.id==='t-'+t)});
   document.querySelectorAll('.tb[data-tab]').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t)});
-  window.scrollTo(0,0);if(t==='week')renderWeek(compute());
+  window.scrollTo(0,0);if(t==='week')renderWeek(compute());if(t==='strength')renderStrength(compute());
 }
 document.querySelectorAll('.tb[data-tab]').forEach(function(b){b.onclick=function(){setTab(b.dataset.tab)}});
 
@@ -495,7 +835,13 @@ $('saveRun').onclick=function(){var km=parseFloat($('inKm').value),dt=$('inDate'
   if(editIdx>=0){var r=S.runs[editIdx];r.date=dt;r.km=+km.toFixed(2);if(addType==='walk')r.type='walk';else delete r.type;
     editIdx=-1;save();close();render();return}
   var e={date:dt,km:+km.toFixed(2),src:'manual'};if(addType==='walk')e.type='walk';
-  S.runs.push(e);save();close();setTab('week');render()};
+  S.runs.push(e);save();close();setTab('week');render();
+  /* A run logged for today offers the post-run strength session straight away */
+  if(addType==='run'&&dt===key(todayD())&&!ST.log[dt]){var pc=sbCfg('A',true);
+    $('postTxt').textContent='Ready for the post-run session? Session A, upper and core, '+pc.rounds+' rounds and a 3-minute stretch. About '+sbMins(pc)+' minutes.';
+    setTimeout(function(){open('postSheet')},320)}};
+$('postGo').onclick=function(){close();openBrief('A',true)};
+$('postLater').onclick=function(){close()};
 $('delEntry').onclick=function(){var r=S.runs[editIdx];if(!r||!confirm('Delete this '+(isWalk(r)?'walk':'run')+' on '+short(parse(r.date))+'?'))return;
   S.runs.splice(editIdx,1);editIdx=-1;save();close();render()};
 $('tabSettings').onclick=function(){$('inWeek').value=S.weekly;$('inYear').value=S.yearly;open('setSheet')};
