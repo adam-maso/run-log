@@ -612,10 +612,10 @@ var EX={
     how:"Hands just wider than your shoulders, body straight from head to heels. Lower until your chest is about a fist's height off the floor, then push the floor away.",
     tips:"Squeeze your glutes and brace your stomach so your hips don't sag. Elbows angle back at about 45 degrees, not flared straight out.",
     easier:"Drop to your knees, or put your hands on a bench or step.",harder:"Take three seconds on the way down."},
-  pike:{n:"Incline pike push-ups",cue:"Hands on a bench, hips high. Head towards the edge.",
-    how:"Hands shoulder width on a sturdy bench, couch edge or low step, feet on the floor. Walk your feet in and lift your hips high so your body makes an upside-down V. Bend your elbows to bring the top of your head towards the edge of the bench, then press back up.",
-    tips:"Same shoulder work as a pike push-up with less of your weight on your arms. Keep the hips high; if they drop, it turns into an incline push-up.",
-    easier:"Use a higher surface, like a kitchen bench.",harder:"Use a lower step, then work towards floor pike push-ups."},
+  pike:{n:"Band overhead press",cue:"Stand on the band. Press straight up, lower slowly.",
+    how:"Stand with both feet on the middle of the band, hip width apart. Hold a handle in each hand at shoulder height, palms facing forward. Press both hands straight up until your arms are straight overhead, then lower back to your shoulders under control.",
+    tips:"Brace your stomach and squeeze your glutes so your lower back doesn't arch. Take two seconds on the way down. Keep the band taut at the bottom so there's no slack.",
+    easier:"Use a lighter band, or stand on it with one foot so there's less tension.",harder:"A heavier band, feet wider on the band, or a three-second lowering."},
   taps:{n:"Plank shoulder taps",cue:"Hips still. Tap the opposite shoulder, alternate.",
     how:"High plank on straight arms. Lift one hand and tap the opposite shoulder, put it down, then switch. Keep going for the full interval.",
     tips:"The goal is zero hip rock. Spread your feet wider if you're twisting.",
@@ -734,7 +734,7 @@ function openBrief(k,post){
   $('sbBTitle').textContent=s.name;
   $('sbRoundsRow').hidden=!!s.fixed;$('sbWarmRow').hidden=post||!!s.noWarm;
   var seg=$('sbRseg');seg.innerHTML='';
-  [3,4,5].forEach(function(n){var b=document.createElement('button');b.type='button';b.textContent=n;b.className=n===cur.rounds?'on':'';
+  [2,3,4,5].forEach(function(n){var b=document.createElement('button');b.type='button';b.textContent=n;b.className=n===cur.rounds?'on':'';
     b.onclick=function(){cur.rounds=n;Array.prototype.forEach.call(seg.children,function(x){x.className=x===b?'on':''});briefText()};seg.appendChild(b)});
   sw($('sbWarm'),cur.warm);sw($('sbShort'),false);sw($('sbVoice'),ST.voice!==false);
   $('sbEx').innerHTML=exHtml(s.ex);
