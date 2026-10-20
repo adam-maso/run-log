@@ -181,7 +181,10 @@ body.open .scrim{opacity:1;pointer-events:auto}
 .sb-row .chev{color:var(--muted);font-size:22px}
 .sb-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .sb-cell{aspect-ratio:1;border-radius:9px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted)}
-.sb-cell.done{background:var(--red);color:#fff}
+.sb-cell.done{background:var(--red);color:#fff;flex-direction:column;line-height:1.05;cursor:pointer}
+.sb-cell .s{font-size:10px;font-weight:700;opacity:.85}
+.sb-cell .r{font-size:17px;font-weight:800}
+.sb-gnote{font-size:12.5px;color:var(--muted);margin:8px 0 0}
 .sb-cell.today{outline:2.5px solid var(--red);outline-offset:1px}
 .sb-cell.future{opacity:.5}
 .sb-measure{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center}
@@ -299,6 +302,7 @@ details.sb-ex[open] summary .c{transform:rotate(90deg)}
   <div id="sbList"></div>
   <h2>28-day block <span>19 Oct to 15 Nov</span></h2>
   <div class="sb-grid" id="sbGrid" aria-label="Strength sessions done in the 28-day block"></div>
+  <p class="sb-gnote">Done days show the session letter and the rounds you finished. Tap one to change the rounds.</p>
   <h2>Check-in <span>day 1 and day 28</span></h2>
   <div class="sb-measure">
     <span></span><span class="h">Waist (cm)</span><span class="h">Push-ups</span>
@@ -607,6 +611,7 @@ function renderRecords(C){
 var SB_START=new Date(2026,9,19),SB_LEN=28;
 if(!S.strength){S.strength={log:{},measure:{},voice:true};save()}
 var ST=S.strength;
+if(!ST.rounds)ST.rounds={};
 var EX={
   pushup:{n:"Push-ups",cue:"Straight line head to heels. Chest to a fist off the floor.",
     how:"Hands just wider than your shoulders, body straight from head to heels. Lower until your chest is about a fist's height off the floor, then push the floor away.",
@@ -698,7 +703,7 @@ function sbMins(c){return Math.round(sbSecs(c)/60)}
 function renderStrength(C){
   var d=sbDayN(),tk=key(C.today),done=ST.log[tk],h,c;
   $('sbSub').textContent=d<1?'Starts 19 Oct':d>SB_LEN?'Block complete':'Day '+d+' of '+SB_LEN;
-  if(done){h='<div class="k">Done today</div><div class="t">Session '+done+': '+SESS[done].name.toLowerCase()+'</div><p>Logged. Pick a session below if you want to go again.</p>'}
+  if(done){var dr=ST.rounds[tk];h='<div class="k">Done today</div><div class="t">Session '+done+': '+SESS[done].name.toLowerCase()+'</div><p>Logged'+(dr?', '+dr+(dr===1?' round':' rounds'):'')+'. Pick a session below if you want to go again.</p>'}
   else if(ranOn(tk)){c=sbCfg('A',true);
     h='<div class="k">After today&rsquo;s run</div><div class="t">Session A: upper and core</div><p>'+c.rounds+' rounds, then a 3-minute stretch. About '+sbMins(c)+' minutes, no warm-up needed.</p><button class="sb-go" data-k="A" data-post="1">Start post-run session</button>'}
   else{var n=nextBC();c=sbCfg(n,false);
@@ -711,12 +716,18 @@ function renderStrength(C){
     rows+='<button class="sb-row" data-k="'+r[0]+'"'+(cf.post?' data-post="1"':'')+'><span class="L">'+r[0]+'</span><span class="x"><b>'+SESS[r[0]].name+'</b><span>'+r[1]+' &middot; about '+sbMins(cf)+' min</span></span><span class="chev">&rsaquo;</span></button>'});
   $('sbList').innerHTML=rows;
   var g='';for(var i=0;i<SB_LEN;i++){var dd=addDays(SB_START,i),k=key(dd);
-    g+='<div class="sb-cell'+(ST.log[k]?' done':'')+(k===tk?' today':'')+(dd>C.today?' future':'')+'" title="'+short(dd)+'">'+(ST.log[k]||(i+1))+'</div>'}
+    var lg=ST.log[k],rd=ST.rounds[k];
+    g+='<div class="sb-cell'+(lg?' done':'')+(k===tk?' today':'')+(dd>C.today?' future':'')+'"'+(lg?' data-day="'+k+'"':'')+' title="'+short(dd)+(lg?', Session '+lg+(rd?', '+rd+' rounds':''):'')+'">'+
+      (lg?(rd?'<span class="s">'+lg+'</span><span class="r">'+rd+'</span>':lg):(i+1))+'</div>'}
   $('sbGrid').innerHTML=g;
 }
 function sbOpenFrom(e){var b=e.target.closest('[data-k]');if(b)openBrief(b.dataset.k,!!b.dataset.post)}
 $('sbToday').addEventListener('click',sbOpenFrom);
 $('sbList').addEventListener('click',sbOpenFrom);
+/* Tap a done day in the 28-day block to set or correct the rounds finished */
+$('sbGrid').addEventListener('click',function(e){var c=e.target.closest('[data-day]');if(!c)return;var k=c.dataset.day;
+  var v=prompt('Rounds finished on '+short(parse(k))+' (Session '+ST.log[k]+')',ST.rounds[k]||'');if(v===null)return;v=v.trim();
+  if(v===''){delete ST.rounds[k]}else{var n=parseInt(v,10);if(!(n>=1&&n<=10))return;ST.rounds[k]=n}save();renderStrength(compute())});
 [['sbW1','w1'],['sbP1','p1'],['sbW28','w28'],['sbP28','p28']].forEach(function(p){var el=$(p[0]);el.value=ST.measure[p[1]]||'';
   el.addEventListener('input',function(){ST.measure[p[1]]=el.value;save()})});
 
@@ -727,20 +738,24 @@ function exHtml(ids){return ids.map(function(id,i){var e=EX[id];
   return '<details class="sb-ex"><summary><span class="i">'+(i+1)+'</span><span class="n">'+e.n+'</span><span class="c" aria-hidden="true">&rsaquo;</span></summary><div class="sb-exb"><dl>'+
     '<div><dt>How</dt><dd>'+e.how+'</dd></div><div><dt>Form</dt><dd>'+e.tips+'</dd></div><div><dt>Easier</dt><dd>'+e.easier+'</dd></div><div><dt>Harder</dt><dd>'+e.harder+'</dd></div></dl></div></details>'}).join('')}
 function briefText(){var s=SESS[cur.key],r=cur.short?1:(s.fixed||cur.rounds);
-  $('sbBFmt').textContent=(r===1?'One round':r+' rounds')+', '+s.work+' seconds on, '+s.rest+' off'+(cur.warm&&!cur.short?', 2-minute warm-up first':'')+(cur.post?', then a 3-minute stretch':'')+'. About '+sbMins(cur)+' minutes.'}
+  $('sbBFmt').textContent=(r===1?'One round':r+' rounds')+', '+s.work+' seconds on, '+s.rest+' off'+(cur.warm&&!cur.short?', 2-minute warm-up first':'')+(cur.post?', then a 3-minute stretch':'')+'. About '+sbMins(cur)+' minutes.';
+  $('sbStart').textContent=s.fixed?'Start':'Start '+(r===1?'1 round':r+' rounds')}
 function openBrief(k,post){
   cur=sbCfg(k,post);var s=SESS[k];
   $('sbBTag').textContent='Session '+k+(post?' · after your run':'');
   $('sbBTitle').textContent=s.name;
   $('sbRoundsRow').hidden=!!s.fixed;$('sbWarmRow').hidden=post||!!s.noWarm;
   var seg=$('sbRseg');seg.innerHTML='';
-  [2,3,4,5].forEach(function(n){var b=document.createElement('button');b.type='button';b.textContent=n;b.className=n===cur.rounds?'on':'';
-    b.onclick=function(){cur.rounds=n;Array.prototype.forEach.call(seg.children,function(x){x.className=x===b?'on':''});briefText()};seg.appendChild(b)});
+  [2,3,4,5].forEach(function(n){var b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.n=n;b.className=n===cur.rounds?'on':'';seg.appendChild(b)});
   sw($('sbWarm'),cur.warm);sw($('sbShort'),false);sw($('sbVoice'),ST.voice!==false);
   $('sbEx').innerHTML=exHtml(s.ex);
   $('sbCoolWrap').hidden=!post;if(post)$('sbCool').innerHTML=exHtml(COOL);
   briefText();$('sbBrief').hidden=false;$('sbBrief').scrollTop=0;
 }
+/* One listener on the rounds control; the highlighted number is the single source of truth for the timer */
+$('sbRseg').addEventListener('click',function(e){var b=e.target.closest('button[data-n]');if(!b)return;cur.rounds=+b.dataset.n;
+  Array.prototype.forEach.call(this.children,function(x){x.className=x===b?'on':''});briefText()});
+function pickedRounds(){var on=$('sbRseg').querySelector('button.on');if(on&&!SESS[cur.key].fixed)cur.rounds=+on.dataset.n}
 $('sbWarm').onclick=function(){cur.warm=!cur.warm;sw(this,cur.warm);briefText()};
 $('sbShort').onclick=function(){cur.short=!cur.short;sw(this,cur.short);briefText()};
 $('sbVoice').onclick=function(){ST.voice=ST.voice===false;sw(this,ST.voice);save()};
@@ -766,7 +781,10 @@ function build(){var s=SESS[cur.key],r=cur.short?1:(s.fixed||cur.rounds),out=[];
   if(cur.post)COOL.forEach(function(id){out.push({kind:'cool',dur:60,ex:id})});
   return out}
 function nextName(from){for(var i=from+1;i<phases.length;i++)if(phases[i].ex&&phases[i].kind!=='rest')return EX[phases[i].ex].n;return null}
-function logIt(){if(logged)return;logged=true;var tk=key(todayD());ST.log[tk]=cur.key;save()}
+function fullRounds(){var s=SESS[cur.key];return cur.short?1:(s.fixed||cur.rounds)}
+/* Rounds fully finished before phase i: a round counts once its last exercise is behind you */
+function roundsDone(i){var s=SESS[cur.key],last=s.ex[s.ex.length-1],n=0;for(var j=0;j<i&&j<phases.length;j++){var p=phases[j];if(p.kind==='work'&&p.ex===last)n=p.round}return n}
+function logIt(n){if(logged)return;logged=true;var tk=key(todayD());ST.log[tk]=cur.key;ST.rounds[tk]=n||fullRounds();save()}
 function enter(i){
   if(i>=phases.length)return finishRun();if(i<0)i=0;
   idx=i;lastSec=-1;var p=phases[i],nx=nextName(i),e=p.ex?EX[p.ex]:null;
@@ -795,7 +813,7 @@ function tick(){var p=phases[idx];if(!p)return;
 function e2(p){return p.ex&&p.kind!=='rest'&&EX[p.ex].split}
 function startRun(){
   try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();actx.resume&&actx.resume()}catch(e){actx=null}
-  phases=build();paused=false;logged=false;$('sbPause').textContent='Pause';
+  pickedRounds();phases=build();paused=false;logged=false;$('sbPause').textContent='Pause';
   $('sbRun').hidden=false;lockScreen();clearInterval(ticker);ticker=setInterval(tick,200);enter(0)}
 function stopRun(){clearInterval(ticker);ticker=null;unlockScreen();try{speechSynthesis.cancel()}catch(e){}$('sbRun').hidden=true}
 function finishRun(){logIt();stopRun();$('sbBrief').hidden=true;setTab('strength');render();say('Session done. Nice work.')}
@@ -805,8 +823,9 @@ $('sbPause').onclick=function(){
   else{endAt=Date.now()+leftAtPause;paused=false;this.textContent='Pause'}tick()};
 $('sbSkip').onclick=function(){paused=false;$('sbPause').textContent='Pause';enter(idx+1)};
 $('sbPrev').onclick=function(){paused=false;$('sbPause').textContent='Pause';enter(idx-1)};
-/* Ending early only counts once you're into the last exercise or the stretch */
-$('sbQuit').onclick=function(){var p=phases[idx];if(logged||(p&&idx>=phases.length-2-(cur.post?COOL.length:0)))return finishRun();stopRun()};
+/* Ending early: into the last exercise or the stretch counts as the full session; otherwise it logs the rounds you finished, if any */
+$('sbQuit').onclick=function(){var p=phases[idx];if(logged||(p&&idx>=phases.length-2-(cur.post?COOL.length:0)))return finishRun();
+  var n=roundsDone(idx);if(n>0){logIt(n);return finishRun()}stopRun()};
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&!$('sbRun').hidden)lockScreen()});
 
 /* ---------- wiring ---------- */
